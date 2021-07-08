@@ -1,0 +1,40 @@
+# Troubleshooting {#troubleshooting}
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+### What does this error message mean?
+
+
+
+
+### Why do my predictions look bad?
+
+
+
+
+
+### How do I make a reproducible example?
+
+Please provide:
+
+- A link to a CSV with the data
+
+- The minimal amount of code needed to reproduce the problem
+
+- The output of `sessionInfo()`
+
+- Information about how the R environment was created (e.g. the command used to start the Singularity session)
+
+
+
+
+
+
+
+

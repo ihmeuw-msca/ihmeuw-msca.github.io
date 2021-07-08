@@ -41,3 +41,7 @@ mixed-effects-regression-2
 mixed-effects-meta-regression-with-z-covariates
 recap-so-far
 section
+troubleshooting
+what-does-this-error-message-mean
+why-do-my-predictions-look-bad
+how-do-i-make-a-reproducible-example

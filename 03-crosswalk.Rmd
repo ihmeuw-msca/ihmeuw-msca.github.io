@@ -40,21 +40,16 @@ source("filepaths.R")
 
 ```{r message = FALSE}
 library(crosswalk002, lib.loc = path_to_r_version4_packages)
-
 library(dplyr)
-
 set.seed(123)
-
 # data for the meta-regression
 # -- in a real analysis, you'd get this dataset by 
 #    creating matched pairs of alternative/reference observations,
 #    then using delta_transform() and calculate_diff() to get
 #    log(alt)-log(ref) or logit(alt)-logit(ref) as your dependent variable
-
 beta0_true <- -3
 beta1_true <- 1
 beta2_true <- 2
-
 df_matched <- data.frame(
   x1 = runif(n = 200, min = 0, max = 4),
   x2 = rbinom(n = 200, prob = 0.5, size = 1) ) %>%
@@ -65,9 +60,7 @@ df_matched <- data.frame(
     refvar = "measured",
     group_id = rep(1:20, each = 10)
   )
-
 head(df_matched)
-
 # original dataset with alternative observations to be adjusted
 df_orig <- data.frame(stringsAsFactors = FALSE,
   meanvar = runif(400, min = 0.2, max = 0.8), # original prevalence values; between 0 and 1
@@ -77,9 +70,7 @@ df_orig <- data.frame(stringsAsFactors = FALSE,
   obs_method = sample(c("selfreported", "measured"), size = 400, replace = TRUE)
 )
 df_orig$row_id <- paste0("row", 1:nrow(df_orig))
-
 head(df_orig)
-
 ```
 
 
@@ -105,7 +96,6 @@ df1 <- CWData(
   study_id = "group_id",    # name of the column indicating group membership, usually the matching groups
   add_intercept = TRUE      # adds a column called "intercept" that may be used in CWModel()
 )
-
 fit1 <- CWModel(
   cwdata = df1,            # object returned by `CWData()`
   obs_type = "diff_logit", # "diff_log" or "diff_logit" depending on whether bounds are [0, Inf) or [0, 1]
@@ -117,23 +107,18 @@ fit1 <- CWModel(
   gold_dorm = "measured"   # the level of `alt_dorms` that indicates it's the gold standard
                            # this will be useful when we can have multiple "reference" groups in NMA
 )
-
 print(data.frame( # checking that the model recovers the true betas
   beta_true = c(beta0_true, beta1_true, beta2_true), 
   beta_mean = fit1$beta[4:6],
   beta_se = fit1$beta_sd[4:6]
 ))
-
-
 ```
 To create a data frame with estimated coefficients, use `create_result_df()`. This is useful for saving coefficient summaries to CSV. To save a model object for future use, use `py_save_object()`. 
 ```{r eval=FALSE}
 df_result <- fit1$create_result_df()
 write.csv(df_result, file.path(path_to_misc_outputs, "df_result_crosswalk.csv"))
-
 py_save_object(object = fit1, filename = file.path(path_to_misc_outputs, "fit1.pkl"), pickle = "dill")
 fit1 <- py_load_object(filename = file.path(path_to_misc_outputs, "fit1.pkl"), pickle = "dill")
-
 ```
 
 
@@ -157,8 +142,6 @@ preds1 <- adjust_orig_vals(
   data_id = "row_id"   # optional argument to add a user-defined ID to the predictions;
                        # name of the column with the IDs
 )
-
-
 # the result of adjust_orig_vals() is a five-element list,
 # vectors containing: 
 # -- the adjusted mean and SE of the adjusted mean in linear space
@@ -167,38 +150,29 @@ preds1 <- adjust_orig_vals(
 #    so we *subtract* this value to make the adjustment
 # -- an identifier for the row of the prediction frame the corresponds to the prediction
 lapply(preds1, head)
-
 # now we add the adjusted values back to the original dataset
 df_orig[, 
   c("meanvar_adjusted", "sdvar_adjusted", 
     "pred_logit", "pred_se_logit", "data_id")] <- preds1
-
 # note that the gold standard observations remain untouched
 head(df_orig)
-
 ```
 
 To make sure we understand what's going on, let's manually calculate the adjustment for a particular row of the original dataset.
 
 ```{r message = FALSE}
 print(df_orig[3,]) # row 3 is a self-reported observation with prevalence 0.296
-
 fit1$fixed_vars # estimated betas
-
 # the predicted adjustment for an observations with x1=0.8575217 and x2=1 should be...
 (pred <- -3.164455 + 1.081816*0.8575217 + 2.076966*1)
-
 # the prediction is defined as logit(alt) - logit(ref), so the final adjusted value should be
 # logit(mean_adjusted) = logit(mean_alt) - prediction
 logit <- function(p) log(p/(1-p))
 inv_logit <- function(x) exp(x)/(1+exp(x))
-
 logit_mean_adjusted <- logit(df_orig[3, "meanvar"]) - pred
 inv_logit(logit_mean_adjusted)
-
 # check that it's the same
 round(inv_logit(logit_mean_adjusted), digits = 5) == round(df_orig[3, "meanvar_adjusted"], digits = 5)
-
 # SE of the adjusted data point is calculated as sqrt(a^2 + b^2 + c^2), where
 # a is the (log or logit) standard error of the original data point,
 # b is the standard error of the predicted adjustment
@@ -208,7 +182,6 @@ round(inv_logit(logit_mean_adjusted), digits = 5) == round(df_orig[3, "meanvar_a
 # 
 # this method increases an adjusted observation's uncertainty and effectively downweights it in subsequent analyses, like an ST-GPR model to estimate prevalence globally
 #
-
 ```
 
 
@@ -222,10 +195,8 @@ First, we create some simulated data. The column indicating which diagnostic is 
 
 ```{r}
 set.seed(123)
-
 true_beta1 <- 1 # define the true coefficient value for x1
 case_defs <- c(B = 2, C = 3) # define case definitions and true coefficient values
-
 df_matched2 <- data.frame(id = 1:400) %>%
   mutate(
     altvar = sample(c("B", "C"), nrow(.), TRUE),
@@ -242,10 +213,7 @@ df_matched2 <- data.frame(id = 1:400) %>%
   arrange(group_id) %>%
   filter(altvar != refvar) %>%
   select(altvar, refvar, logit_diff, logit_diff_se, x1, group_id)
-
 head(df_matched2)
-
-
 ```
 
 
@@ -262,7 +230,6 @@ df2 <- CWData(
   # covs = list(),        # names of columns to be used as covariates later
   study_id = "group_id"     # name of the column indicating group membership, usually the matching groups
 )
-
 fit2 <- CWModel(
   cwdata = df2,            # object returned by `CWData()`
   obs_type = "diff_logit", # "diff_log" or "diff_logit" depending on whether bounds are [0, Inf) or [0, 1]
@@ -272,16 +239,12 @@ fit2 <- CWModel(
   gold_dorm = "A",   # the level of `ref_dorms` that indicates it's the gold standard
   order_prior = list(c("B", "C")) # tells the model that the coefficient estimated for B should be <= the coefficient for C
 )
-
-
 df_tmp <- fit2$create_result_df()
-
 print(data.frame( # checking that the model recovers the true betas
   beta_true = case_defs,
   beta_mean = fit2$beta[2:3],
   beta_se = fit2$beta_sd[2:3]
 ))
-
 ```
 
 Finally, as before, we use the model to adjust biased observations in the original dataset. 
@@ -295,9 +258,7 @@ df_orig2 <- data.frame(id = 1:600) %>%
     group_id = sample(1:20, size = nrow(.), replace = TRUE),
     intercept = 0,
     obs_method = sample(c("A", "B", "C"), nrow(.), TRUE) )
-
 head(df_orig2)
-
 preds2 <- adjust_orig_vals(
   fit_object = fit2, # object returned by `CWModel()`
   df = df_orig2,
@@ -305,15 +266,12 @@ preds2 <- adjust_orig_vals(
   orig_vals_mean = "meanvar",
   orig_vals_se = "sdvar"
 )
-
 # now we add the adjusted values back to the original dataset
 df_orig2[, c(
   "meanvar_adjusted", "sdvar_adjusted", "pred_logit", 
   "pred_se_logit", "data_id")] <- preds2
-
 # note that the gold standard observations remain untouched
 head(df_orig2)
-
 ```
 
 
@@ -324,14 +282,11 @@ Sometimes alternative definitions are not mutually exclusive. For example, maybe
 ```{r}
 set.seed(1)
 df3 <- data.frame(id = 1:400)
-
 #####
 # create the simulated dataset
-
 # define case definitions and coefficients for simulation
 case_defs <- c(B = 2, C = 3)
 n_sample_defs <- 2
-
 # randomly sample from case definition components to make combined case definitions
 df3$alt <- sapply(1:nrow(df3), function(i) {
   paste(sort(sample(x = names(case_defs), size = sample(1:n_sample_defs))), collapse = '_')
@@ -339,28 +294,22 @@ df3$alt <- sapply(1:nrow(df3), function(i) {
 df3$ref <- sapply(1:nrow(df3), function(i) {
   paste(sort(sample(x = names(case_defs), size = sample(1:n_sample_defs))), collapse = '_')
 })
-
 # make half of the reference case definitions 'A' to signify the gold standard
 df3$ref <- ifelse(df3$id %% 2 == 0, "A", df3$ref)
 df4 <- filter(df3, ref != alt) # remove duplicates
-
 # subtract coefficient if component is in the reference def, and 
 # add coefficient if component is in the alternative def
 df4$logit_prev_diff <- 0
 for (i in names(case_defs)) df4$logit_prev_diff <- df4$logit_prev_diff - (sapply(i, grepl, df4$ref) * case_defs[i])
 for (i in names(case_defs)) df4$logit_prev_diff <- df4$logit_prev_diff + (sapply(i, grepl, df4$alt) * case_defs[i])
-
 df4$logit_prev_diff <- as.numeric(df4$logit_prev_diff + rnorm(n = nrow(df4), mean = 0, sd = 1))
 df4$logit_prev_diff_se <- 0.5
-
 head(df4)
-
 ```
 
 To use composite definitions -- alternative definitions with non-mutually exclusive sub-definitions -- we include a delimiter in the values we pass to the `alt_dorms` and `ref_dorms` columns. If the delimiter is "_" as in this example, we pass it as an argument to the `dorm_separator` parameter of `CWData()`. 
 
 ```{r}
-
 #####
 dat4 <- CWData(
   df = df4,
@@ -373,7 +322,6 @@ dat4 <- CWData(
   study_id = "id",
   add_intercept = TRUE
 )
-
 fit4 <- CWModel(
   cwdata = dat4,
   obs_type = "diff_logit",
@@ -383,11 +331,8 @@ fit4 <- CWModel(
   gold_dorm = "A"
   # prior_gamma_uniform = array(c(0, 0.4))
 )
-
 fit4$fixed_vars
 case_defs
-
-
 ```
 ```{r}
 df_orig4 <- df4 %>%
@@ -396,7 +341,6 @@ df_orig4 <- df4 %>%
     prev_orig_se = 0.2,
     meas_method = ref) %>%
   select(-ref, -alt, -logit_prev_diff, -logit_prev_diff_se)
-
 preds4 <- adjust_orig_vals(
   fit_object = fit4, # object returned by `CWModel()`
   df = df_orig4,
@@ -404,12 +348,9 @@ preds4 <- adjust_orig_vals(
   orig_vals_mean = "prev_orig",
   orig_vals_se = "prev_orig_se"
 )
-
 df_orig4[, c("prev_adjusted", "prev_se_adjusted", "prediction_logit", 
              "prediction_se_logit", "data_id")] <- preds4
-
 head(df_orig4)
-
 ```
 
 
@@ -423,7 +364,6 @@ PDFs of the plots are saved in the location passed to `plots_dir`.
 
 
 ```{r echo=TRUE, eval=FALSE}
-
 df_matched5 <- data.frame(id = 1:200) %>%
   mutate(
     logit_diff_se = runif(nrow(.), 0.5, 10),
@@ -432,7 +372,6 @@ df_matched5 <- data.frame(id = 1:200) %>%
     refvar = "measured",
     group_id = rep(1:10, each = 20)
   )
-
 dat5 <- CWData(
   df = df_matched5,
   obs = "logit_diff",
@@ -443,7 +382,6 @@ dat5 <- CWData(
   study_id = "group_id",
   add_intercept = TRUE
 )
-
 fit5 <- CWModel(
   cwdata = dat5,
   obs_type = "diff_logit",
@@ -452,13 +390,10 @@ fit5 <- CWModel(
   gold_dorm = "measured",
   inlier_pct = 0.9
 )
-
 ##### don't forget to run repl_python() !
 # ... then type 'exit' to get back to the R interpreter
 repl_python()
-
 plots <- import("crosswalk.plots")
-
 plots$funnel_plot(
   cwmodel = fit5, 
   cwdata = dat5,
@@ -469,14 +404,11 @@ plots$funnel_plot(
   file_name = "funny_plot_example_v10",
   write_file = TRUE
 )
-
 ```
 
 For the dose-response plot, the variable given to `dose_variable` will be on the x-axis.
 
 ```{r echo=TRUE, eval=FALSE}
-
-
 plots$dose_response_curve(
   dose_variable = 'x1',
   obs_method = 'B', 
@@ -487,27 +419,10 @@ plots$dose_response_curve(
   plots_dir=path_to_misc_outputs, 
   file_name = "doseresponse_plot_example_v7", 
   write_file=TRUE)
-
-
 # py_run_string("import importlib; importlib.reload(plots)")
 # importlib <- import("importlib")
 # plots <- importlib$reload(plots)
-
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
