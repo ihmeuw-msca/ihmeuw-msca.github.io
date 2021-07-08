@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 MR-BRT | Health Metrics Toolbox</title>
+  <meta name="description" content="A guide to statistical tools developed by IHME’s Math Sciences team, led by Aleksandr Aravkin and Peng Zheng" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 MR-BRT | Health Metrics Toolbox" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A guide to statistical tools developed by IHME’s Math Sciences team, led by Aleksandr Aravkin and Peng Zheng" />
+  <meta name="github-repo" content="rsoren/health_metrics_toolbox" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 MR-BRT | Health Metrics Toolbox" />
+  
+  <meta name="twitter:description" content="A guide to statistical tools developed by IHME’s Math Sciences team, led by Aleksandr Aravkin and Peng Zheng" />
+  
+
+<meta name="author" content="Maintained by Reed Sorensen (rsoren@uw.edu)" />
+
+
+<meta name="date" content="2021-07-07" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="quickstart.html"/>
+<link rel="next" href="xwalk.html"/>
+<script src="libs/header-attrs-2.8/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Health Metrics Toolbox</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="quickstart.html"><a href="quickstart.html"><i class="fa fa-check"></i><b>2</b> Quick start</a></li>
+<li class="chapter" data-level="3" data-path="mrbrt.html"><a href="mrbrt.html"><i class="fa fa-check"></i><b>3</b> MR-BRT</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="mrbrt.html"><a href="mrbrt.html#prep_data"><i class="fa fa-check"></i><b>3.1</b> Prepare simulated data</a></li>
+<li class="chapter" data-level="3.2" data-path="mrbrt.html"><a href="mrbrt.html#section1"><i class="fa fa-check"></i><b>3.2</b> Fitting a standard mixed effects model</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="mrbrt.html"><a href="mrbrt.html#section1_1"><i class="fa fa-check"></i><b>3.2.1</b> – Point prediction only</a></li>
+<li class="chapter" data-level="3.2.2" data-path="mrbrt.html"><a href="mrbrt.html#section1_2"><i class="fa fa-check"></i><b>3.2.2</b> – Uncertainty from fixed effects only</a></li>
+<li class="chapter" data-level="3.2.3" data-path="mrbrt.html"><a href="mrbrt.html#section1_3"><i class="fa fa-check"></i><b>3.2.3</b> – Uncertainty from fixed effects and between-study heterogeneity</a></li>
+<li class="chapter" data-level="3.2.4" data-path="mrbrt.html"><a href="mrbrt.html#section1_4"><i class="fa fa-check"></i><b>3.2.4</b> – Predicting out on the random effects</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="mrbrt.html"><a href="mrbrt.html#section2"><i class="fa fa-check"></i><b>3.3</b> Priors</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="mrbrt.html"><a href="mrbrt.html#section2_2"><i class="fa fa-check"></i><b>3.3.1</b> - Setting a prior on beta</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="mrbrt.html"><a href="mrbrt.html#section3"><i class="fa fa-check"></i><b>3.4</b> Removing the effects of outliers with trimming</a></li>
+<li class="chapter" data-level="3.5" data-path="mrbrt.html"><a href="mrbrt.html#section4"><i class="fa fa-check"></i><b>3.5</b> Splines</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="mrbrt.html"><a href="mrbrt.html#section4_1"><i class="fa fa-check"></i><b>3.5.1</b> - Setting priors and shape constraints on splines</a></li>
+<li class="chapter" data-level="3.5.2" data-path="mrbrt.html"><a href="mrbrt.html#section4_2"><i class="fa fa-check"></i><b>3.5.2</b> - Ensemble splines</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="mrbrt.html"><a href="mrbrt.html#section5"><i class="fa fa-check"></i><b>3.6</b> The ratio model</a></li>
+<li class="chapter" data-level="3.7" data-path="mrbrt.html"><a href="mrbrt.html#section6"><i class="fa fa-check"></i><b>3.7</b> Automated covariate selection</a></li>
+<li class="chapter" data-level="3.8" data-path="mrbrt.html"><a href="mrbrt.html#section7"><i class="fa fa-check"></i><b>3.8</b> Calculating an evidence score</a></li>
+<li class="chapter" data-level="3.9" data-path="mrbrt.html"><a href="mrbrt.html#section9"><i class="fa fa-check"></i><b>3.9</b> Frequently asked questions</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="xwalk.html"><a href="xwalk.html"><i class="fa fa-check"></i><b>4</b> Crosswalk</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="xwalk.html"><a href="xwalk.html#ex1"><i class="fa fa-check"></i><b>4.1</b> Example 1: one reference and one alternative</a></li>
+<li class="chapter" data-level="4.2" data-path="xwalk.html"><a href="xwalk.html#ex2"><i class="fa fa-check"></i><b>4.2</b> Example 2: one reference and multiple alternatives, with indirect comparisons</a></li>
+<li class="chapter" data-level="4.3" data-path="xwalk.html"><a href="xwalk.html#ex3"><i class="fa fa-check"></i><b>4.3</b> Example 3: one reference and multiple alternatives; alternatives composed of sub-definitions</a></li>
+<li class="chapter" data-level="4.4" data-path="xwalk.html"><a href="xwalk.html#ex4"><i class="fa fa-check"></i><b>4.4</b> Funnel plots and dose-response plots</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Health Metrics Toolbox</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="mrbrt" class="section level1" number="3">
+<h1><span class="header-section-number">Chapter 3</span> MR-BRT</h1>
+<div id="prep_data" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Prepare simulated data</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="mrbrt.html#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="mrbrt.html#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mrbrt002, <span class="at">lib.loc =</span> path_to_r_version4_packages)</span>
+<span id="cb1-3"><a href="mrbrt.html#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="mrbrt.html#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-5"><a href="mrbrt.html#cb1-5" aria-hidden="true" tabindex="-1"></a>k_studies <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb1-6"><a href="mrbrt.html#cb1-6" aria-hidden="true" tabindex="-1"></a>n_per_study <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb1-7"><a href="mrbrt.html#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># k_studies &lt;- 40</span></span>
+<span id="cb1-8"><a href="mrbrt.html#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># n_per_study &lt;- 40</span></span>
+<span id="cb1-9"><a href="mrbrt.html#cb1-9" aria-hidden="true" tabindex="-1"></a>tau_1 <span class="ot">&lt;-</span> <span class="dv">4</span></span>
+<span id="cb1-10"><a href="mrbrt.html#cb1-10" aria-hidden="true" tabindex="-1"></a>sigma_1 <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb1-11"><a href="mrbrt.html#cb1-11" aria-hidden="true" tabindex="-1"></a>tau_2 <span class="ot">&lt;-</span> <span class="fl">0.6</span></span>
+<span id="cb1-12"><a href="mrbrt.html#cb1-12" aria-hidden="true" tabindex="-1"></a>sigma_2 <span class="ot">&lt;-</span> <span class="fl">0.2</span></span>
+<span id="cb1-13"><a href="mrbrt.html#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="mrbrt.html#cb1-14" aria-hidden="true" tabindex="-1"></a>df_sim_study <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">study_id =</span> <span class="fu">as.factor</span>(<span class="dv">1</span><span class="sc">:</span>k_studies)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-15"><a href="mrbrt.html#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-16"><a href="mrbrt.html#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">study_effect1 =</span> <span class="fu">rnorm</span>(<span class="at">n =</span> k_studies, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> tau_1),</span>
+<span id="cb1-17"><a href="mrbrt.html#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">study_effect2 =</span> <span class="fu">rnorm</span>(<span class="at">n =</span> k_studies, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> tau_2)</span>
+<span id="cb1-18"><a href="mrbrt.html#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># study_colors = brewer.pal(n = k_studies, &quot;Spectral&quot;)</span></span>
+<span id="cb1-19"><a href="mrbrt.html#cb1-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-20"><a href="mrbrt.html#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="mrbrt.html#cb1-21" aria-hidden="true" tabindex="-1"></a>df_sim1 <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_sim_study), <span class="cf">function</span>(i) {</span>
+<span id="cb1-22"><a href="mrbrt.html#cb1-22" aria-hidden="true" tabindex="-1"></a>  df_sim_study[<span class="fu">rep</span>(i, n_per_study), ] })) <span class="sc">%&gt;%</span></span>
+<span id="cb1-23"><a href="mrbrt.html#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-24"><a href="mrbrt.html#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">x1 =</span> <span class="fu">runif</span>(<span class="at">n =</span> <span class="fu">nrow</span>(.), <span class="at">min =</span> <span class="dv">0</span>, <span class="at">max =</span> <span class="dv">10</span>),</span>
+<span id="cb1-25"><a href="mrbrt.html#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">y1 =</span> <span class="fl">0.9</span><span class="sc">*</span>x1 <span class="sc">+</span> study_effect1 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(.), <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> sigma_1),</span>
+<span id="cb1-26"><a href="mrbrt.html#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y1_se =</span> sigma_1,</span>
+<span id="cb1-27"><a href="mrbrt.html#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">y2_true =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="fl">0.43</span><span class="sc">*</span>x1<span class="fl">-2.9</span>),</span>
+<span id="cb1-28"><a href="mrbrt.html#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">y2 =</span> y2_true <span class="sc">-</span> <span class="fu">min</span>(y2_true) <span class="sc">+</span> study_effect2 <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(.), <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> sigma_2),</span>
+<span id="cb1-29"><a href="mrbrt.html#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">y2_se =</span> sigma_2,</span>
+<span id="cb1-30"><a href="mrbrt.html#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">is_outlier =</span> <span class="cn">FALSE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-31"><a href="mrbrt.html#cb1-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(x1)</span>
+<span id="cb1-32"><a href="mrbrt.html#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="mrbrt.html#cb1-33" aria-hidden="true" tabindex="-1"></a>df_sim2 <span class="ot">&lt;-</span> df_sim1 <span class="sc">%&gt;%</span></span>
+<span id="cb1-34"><a href="mrbrt.html#cb1-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rbind</span>(., .[(<span class="fu">nrow</span>(.)<span class="sc">-</span><span class="dv">7</span>)<span class="sc">:</span>(<span class="fu">nrow</span>(.)<span class="sc">-</span><span class="dv">4</span>), ] <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">y1=</span>y1<span class="dv">-18</span>, <span class="at">y2=</span>y2<span class="dv">-4</span>, <span class="at">is_outlier =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb1-35"><a href="mrbrt.html#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="mrbrt.html#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="co"># function for plotting uncertainty intervals</span></span>
+<span id="cb1-37"><a href="mrbrt.html#cb1-37" aria-hidden="true" tabindex="-1"></a>add_ui <span class="ot">&lt;-</span> <span class="cf">function</span>(dat, x_var, lo_var, hi_var, <span class="at">color =</span> <span class="st">&quot;darkblue&quot;</span>, <span class="at">opacity =</span> <span class="fl">0.2</span>) {</span>
+<span id="cb1-38"><a href="mrbrt.html#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">polygon</span>(</span>
+<span id="cb1-39"><a href="mrbrt.html#cb1-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">c</span>(dat[, x_var], <span class="fu">rev</span>(dat[, x_var])),</span>
+<span id="cb1-40"><a href="mrbrt.html#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">c</span>(dat[, lo_var], <span class="fu">rev</span>(dat[, hi_var])),</span>
+<span id="cb1-41"><a href="mrbrt.html#cb1-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="fu">adjustcolor</span>(<span class="at">col =</span> color, <span class="at">alpha.f =</span> opacity), <span class="at">border =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-42"><a href="mrbrt.html#cb1-42" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-43"><a href="mrbrt.html#cb1-43" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><br><br></p>
+</div>
+<div id="section1" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> Fitting a standard mixed effects model</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="mrbrt.html#cb2-1" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb2-2"><a href="mrbrt.html#cb2-2" aria-hidden="true" tabindex="-1"></a>dat1<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb2-3"><a href="mrbrt.html#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim1,  <span class="at">col_obs =</span> <span class="st">&quot;y1&quot;</span>, <span class="at">col_obs_se =</span> <span class="st">&quot;y1_se&quot;</span>,</span>
+<span id="cb2-4"><a href="mrbrt.html#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;x1&quot;</span>), <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span> )</span>
+<span id="cb2-5"><a href="mrbrt.html#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="mrbrt.html#cb2-6" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb2-7"><a href="mrbrt.html#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat1,</span>
+<span id="cb2-8"><a href="mrbrt.html#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb2-9"><a href="mrbrt.html#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;intercept&quot;</span>, <span class="at">use_re =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb2-10"><a href="mrbrt.html#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;x1&quot;</span>) ) )</span>
+<span id="cb2-11"><a href="mrbrt.html#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="mrbrt.html#cb2-12" aria-hidden="true" tabindex="-1"></a>mod1<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb2-13"><a href="mrbrt.html#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="mrbrt.html#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># df_pred1 &lt;- data.frame(x1 = seq(0, 10, by = 2), study_id = &quot;4&quot;)</span></span>
+<span id="cb2-15"><a href="mrbrt.html#cb2-15" aria-hidden="true" tabindex="-1"></a>df_pred1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.1</span>))</span>
+<span id="cb2-16"><a href="mrbrt.html#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="mrbrt.html#cb2-17" aria-hidden="true" tabindex="-1"></a>dat_pred1 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb2-18"><a href="mrbrt.html#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="mrbrt.html#cb2-19" aria-hidden="true" tabindex="-1"></a>dat_pred1<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb2-20"><a href="mrbrt.html#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_pred1, </span>
+<span id="cb2-21"><a href="mrbrt.html#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs=</span><span class="fu">list</span>(<span class="st">&#39;x1&#39;</span>)</span>
+<span id="cb2-22"><a href="mrbrt.html#cb2-22" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>To save a model object, use the <code>py_save_object()</code> function. To load a saved model object, use <code>py_load_object</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="mrbrt.html#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># py_save_object(object = mod1, filename = file.path(path_to_misc_outputs, &quot;mod1.pkl&quot;), pickle = &quot;dill&quot;)</span></span>
+<span id="cb3-2"><a href="mrbrt.html#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># mod1 &lt;- py_load_object(filename = file.path(path_to_misc_outputs, &quot;mod1.pkl&quot;), pickle = &quot;dill&quot;)</span></span></code></pre></div>
+<p><br></p>
+<div id="section1_1" class="section level3" number="3.2.1">
+<h3><span class="header-section-number">3.2.1</span> – Point prediction only</h3>
+<p>If you don’t need uncertainty estimates, this option is the fastest.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="mrbrt.html#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pred1 &lt;- mod1$create_draws(</span></span>
+<span id="cb4-2"><a href="mrbrt.html#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   data = dat_pred1,</span></span>
+<span id="cb4-3"><a href="mrbrt.html#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   sample_size = 1L,</span></span>
+<span id="cb4-4"><a href="mrbrt.html#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   beta_samples = matrix(mod1$beta_soln, nrow = 1), </span></span>
+<span id="cb4-5"><a href="mrbrt.html#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   gamma_samples = matrix(mod1$gamma_soln, nrow = 1), </span></span>
+<span id="cb4-6"><a href="mrbrt.html#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   use_re = FALSE  )</span></span>
+<span id="cb4-7"><a href="mrbrt.html#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="mrbrt.html#cb4-8" aria-hidden="true" tabindex="-1"></a>pred1 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_pred1)</span>
+<span id="cb4-9"><a href="mrbrt.html#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="mrbrt.html#cb4-10" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred1 <span class="ot">&lt;-</span> pred1</span>
+<span id="cb4-11"><a href="mrbrt.html#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb4-12"><a href="mrbrt.html#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred1, <span class="fu">lines</span>(x1, pred1))</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="section1_2" class="section level3" number="3.2.2">
+<h3><span class="header-section-number">3.2.2</span> – Uncertainty from fixed effects only</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="mrbrt.html#cb5-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> 100L</span>
+<span id="cb5-2"><a href="mrbrt.html#cb5-2" aria-hidden="true" tabindex="-1"></a>samples2 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">sample_soln</span>(<span class="at">sample_size =</span> n_samples)</span>
+<span id="cb5-3"><a href="mrbrt.html#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="mrbrt.html#cb5-4" aria-hidden="true" tabindex="-1"></a>draws2 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">create_draws</span>(</span>
+<span id="cb5-5"><a href="mrbrt.html#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat_pred1,</span>
+<span id="cb5-6"><a href="mrbrt.html#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_samples =</span> samples2[[<span class="dv">1</span>]],</span>
+<span id="cb5-7"><a href="mrbrt.html#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma_samples =</span> samples2[[<span class="dv">2</span>]],</span>
+<span id="cb5-8"><a href="mrbrt.html#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">random_study =</span> <span class="cn">FALSE</span> )</span>
+<span id="cb5-9"><a href="mrbrt.html#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="mrbrt.html#cb5-10" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred2 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_pred1)</span>
+<span id="cb5-11"><a href="mrbrt.html#cb5-11" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred2_lo <span class="ot">&lt;-</span> <span class="fu">apply</span>(draws2, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">quantile</span>(x, <span class="fl">0.025</span>))</span>
+<span id="cb5-12"><a href="mrbrt.html#cb5-12" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred2_hi <span class="ot">&lt;-</span> <span class="fu">apply</span>(draws2, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">quantile</span>(x, <span class="fl">0.975</span>))</span>
+<span id="cb5-13"><a href="mrbrt.html#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb5-14"><a href="mrbrt.html#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred1, <span class="fu">lines</span>(x1, pred2))</span>
+<span id="cb5-15"><a href="mrbrt.html#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="fu">add_ui</span>(df_pred1, <span class="st">&quot;x1&quot;</span>, <span class="st">&quot;pred2_lo&quot;</span>, <span class="st">&quot;pred2_hi&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="section1_3" class="section level3" number="3.2.3">
+<h3><span class="header-section-number">3.2.3</span> – Uncertainty from fixed effects and between-study heterogeneity</h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="mrbrt.html#cb6-1" aria-hidden="true" tabindex="-1"></a>n_samples <span class="ot">&lt;-</span> 100L</span>
+<span id="cb6-2"><a href="mrbrt.html#cb6-2" aria-hidden="true" tabindex="-1"></a>samples3 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">sample_soln</span>(<span class="at">sample_size =</span> n_samples)</span>
+<span id="cb6-3"><a href="mrbrt.html#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="mrbrt.html#cb6-4" aria-hidden="true" tabindex="-1"></a>draws3 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">create_draws</span>(</span>
+<span id="cb6-5"><a href="mrbrt.html#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat_pred1,</span>
+<span id="cb6-6"><a href="mrbrt.html#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_samples =</span> samples3[[<span class="dv">1</span>]],</span>
+<span id="cb6-7"><a href="mrbrt.html#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma_samples =</span> samples3[[<span class="dv">2</span>]],</span>
+<span id="cb6-8"><a href="mrbrt.html#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">random_study =</span> <span class="cn">TRUE</span> )</span>
+<span id="cb6-9"><a href="mrbrt.html#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="mrbrt.html#cb6-10" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred3 <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">predict</span>(dat_pred1)</span>
+<span id="cb6-11"><a href="mrbrt.html#cb6-11" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred3_lo <span class="ot">&lt;-</span> <span class="fu">apply</span>(draws3, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">quantile</span>(x, <span class="fl">0.025</span>))</span>
+<span id="cb6-12"><a href="mrbrt.html#cb6-12" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred3_hi <span class="ot">&lt;-</span> <span class="fu">apply</span>(draws3, <span class="dv">1</span>, <span class="cf">function</span>(x) <span class="fu">quantile</span>(x, <span class="fl">0.975</span>))</span>
+<span id="cb6-13"><a href="mrbrt.html#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb6-14"><a href="mrbrt.html#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred1, <span class="fu">lines</span>(x1, pred3))</span>
+<span id="cb6-15"><a href="mrbrt.html#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">add_ui</span>(df_pred1, <span class="st">&quot;x1&quot;</span>, <span class="st">&quot;pred3_lo&quot;</span>, <span class="st">&quot;pred3_hi&quot;</span>)</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="section1_4" class="section level3" number="3.2.4">
+<h3><span class="header-section-number">3.2.4</span> – Predicting out on the random effects</h3>
+<p>To ensure that predictions from <code>predict()</code> (and <code>create_draws()</code>) align with the corresponding rows of the input data, either: 1) set <code>sort_by_data_id = TRUE</code>; or 2) follow the instructions below.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="mrbrt.html#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. convert prediction frame into a MRData() object</span></span>
+<span id="cb7-2"><a href="mrbrt.html#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. extract the (potentially) sorted data frame with the to_df() function</span></span>
+<span id="cb7-3"><a href="mrbrt.html#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. add the predictions to this new data frame</span></span>
+<span id="cb7-4"><a href="mrbrt.html#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="mrbrt.html#cb7-5" aria-hidden="true" tabindex="-1"></a>dat_sim1_tmp <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb7-6"><a href="mrbrt.html#cb7-6" aria-hidden="true" tabindex="-1"></a>dat_sim1_tmp<span class="sc">$</span><span class="fu">load_df</span>(<span class="at">data =</span> df_sim1, <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;x1&quot;</span>), <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span>)</span>
+<span id="cb7-7"><a href="mrbrt.html#cb7-7" aria-hidden="true" tabindex="-1"></a>df_sim1_tmp <span class="ot">&lt;-</span> dat_sim1_tmp<span class="sc">$</span><span class="fu">to_df</span>()</span>
+<span id="cb7-8"><a href="mrbrt.html#cb7-8" aria-hidden="true" tabindex="-1"></a>df_sim1_tmp<span class="sc">$</span>pred_re <span class="ot">&lt;-</span> mod1<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_sim1_tmp, <span class="at">predict_for_study =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-9"><a href="mrbrt.html#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="mrbrt.html#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="mrbrt.html#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb7-12"><a href="mrbrt.html#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (id <span class="cf">in</span> <span class="fu">unique</span>(df_sim1<span class="sc">$</span>study_id)) {</span>
+<span id="cb7-13"><a href="mrbrt.html#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(<span class="fu">filter</span>(df_sim1, study_id <span class="sc">==</span> id), <span class="fu">lines</span>(x1, y1, <span class="at">lty =</span> <span class="dv">2</span>))</span>
+<span id="cb7-14"><a href="mrbrt.html#cb7-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="mrbrt.html#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb8-2"><a href="mrbrt.html#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (id <span class="cf">in</span> <span class="fu">unique</span>(df_sim1<span class="sc">$</span>study_id)) {</span>
+<span id="cb8-3"><a href="mrbrt.html#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># id &lt;- 4 # dev</span></span>
+<span id="cb8-4"><a href="mrbrt.html#cb8-4" aria-hidden="true" tabindex="-1"></a>  df_tmp <span class="ot">&lt;-</span> <span class="fu">filter</span>(<span class="fu">arrange</span>(df_sim1_tmp, x1), study_id <span class="sc">==</span> id)</span>
+<span id="cb8-5"><a href="mrbrt.html#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(df_tmp, <span class="fu">lines</span>(x1, pred_re, <span class="at">lty =</span> <span class="dv">1</span>))</span>
+<span id="cb8-6"><a href="mrbrt.html#cb8-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="mrbrt.html#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to get the random effects by group...</span></span>
+<span id="cb9-2"><a href="mrbrt.html#cb9-2" aria-hidden="true" tabindex="-1"></a>re <span class="ot">&lt;-</span> mod1<span class="sc">$</span>re_soln</span>
+<span id="cb9-3"><a href="mrbrt.html#cb9-3" aria-hidden="true" tabindex="-1"></a>df_re <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">level =</span> <span class="fu">names</span>(mod1<span class="sc">$</span>re_soln), <span class="at">re =</span> <span class="fu">unlist</span>(mod1<span class="sc">$</span>re_soln))</span>
+<span id="cb9-4"><a href="mrbrt.html#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="mrbrt.html#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># with(df_sim1, plot(x1, y1))</span></span></code></pre></div>
+<p><br><br></p>
+</div>
+</div>
+<div id="section2" class="section level2" number="3.3">
+<h2><span class="header-section-number">3.3</span> Priors</h2>
+<div id="section2_1" class="section level4" number="3.3.0.1">
+<h4><span class="header-section-number">3.3.0.1</span> - Setting a prior on gamma</h4>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="mrbrt.html#cb10-1" aria-hidden="true" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb10-2"><a href="mrbrt.html#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat1,</span>
+<span id="cb10-3"><a href="mrbrt.html#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb10-4"><a href="mrbrt.html#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;intercept&quot;</span>, <span class="at">use_re =</span> <span class="cn">TRUE</span>, <span class="at">prior_gamma_gaussian =</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.02</span>))),</span>
+<span id="cb10-5"><a href="mrbrt.html#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;x1&quot;</span>) ) )</span>
+<span id="cb10-6"><a href="mrbrt.html#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="mrbrt.html#cb10-7" aria-hidden="true" tabindex="-1"></a>mod3<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb10-8"><a href="mrbrt.html#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="mrbrt.html#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># dat_sim1_tmp &lt;- MRData()</span></span>
+<span id="cb10-10"><a href="mrbrt.html#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="co"># dat_sim1_tmp$load_df(data = df_sim1, col_covs = list(&quot;x1&quot;), col_study_id = &quot;study_id&quot;)</span></span>
+<span id="cb10-11"><a href="mrbrt.html#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># df_sim1_tmp &lt;- dat_sim1_tmp$to_df()</span></span>
+<span id="cb10-12"><a href="mrbrt.html#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co"># df_sim1_tmp$pred_re_prior &lt;- mod3$predict(data = dat_sim1_tmp, predict_for_study = TRUE)</span></span>
+<span id="cb10-13"><a href="mrbrt.html#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="mrbrt.html#cb10-14" aria-hidden="true" tabindex="-1"></a>dat_sim1_tmp <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb10-15"><a href="mrbrt.html#cb10-15" aria-hidden="true" tabindex="-1"></a>dat_sim1_tmp<span class="sc">$</span><span class="fu">load_df</span>(<span class="at">data =</span> df_sim1, <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;x1&quot;</span>), <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span>)</span>
+<span id="cb10-16"><a href="mrbrt.html#cb10-16" aria-hidden="true" tabindex="-1"></a>df_sim1<span class="sc">$</span>pred_re_prior <span class="ot">&lt;-</span> mod3<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_sim1_tmp, <span class="at">predict_for_study =</span> <span class="cn">TRUE</span>, <span class="at">sort_by_data_id =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-17"><a href="mrbrt.html#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="mrbrt.html#cb10-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="mrbrt.html#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb10-20"><a href="mrbrt.html#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (id <span class="cf">in</span> <span class="fu">unique</span>(df_sim1<span class="sc">$</span>study_id)) {</span>
+<span id="cb10-21"><a href="mrbrt.html#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># id &lt;- 4 # dev</span></span>
+<span id="cb10-22"><a href="mrbrt.html#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># df_tmp &lt;- filter(arrange(df_sim1_tmp, x1), study_id == id)</span></span>
+<span id="cb10-23"><a href="mrbrt.html#cb10-23" aria-hidden="true" tabindex="-1"></a>  df_tmp <span class="ot">&lt;-</span> <span class="fu">filter</span>(<span class="fu">arrange</span>(df_sim1, x1), study_id <span class="sc">==</span> id)</span>
+<span id="cb10-24"><a href="mrbrt.html#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(df_tmp, <span class="fu">lines</span>(x1, pred_re_prior, <span class="at">lty =</span> <span class="dv">1</span>))</span>
+<span id="cb10-25"><a href="mrbrt.html#cb10-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><br></p>
+</div>
+<div id="section2_2" class="section level3" number="3.3.1">
+<h3><span class="header-section-number">3.3.1</span> - Setting a prior on beta</h3>
+<p>With great power comes great responsibility…</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="mrbrt.html#cb11-1" aria-hidden="true" tabindex="-1"></a>mod4 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb11-2"><a href="mrbrt.html#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat1,</span>
+<span id="cb11-3"><a href="mrbrt.html#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb11-4"><a href="mrbrt.html#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;intercept&quot;</span>, <span class="at">use_re =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb11-5"><a href="mrbrt.html#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;x1&quot;</span>, <span class="at">prior_beta_uniform =</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">3.1</span>, <span class="sc">-</span><span class="fl">2.9</span>))) ) )</span>
+<span id="cb11-6"><a href="mrbrt.html#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="mrbrt.html#cb11-7" aria-hidden="true" tabindex="-1"></a>mod4<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb11-8"><a href="mrbrt.html#cb11-8" aria-hidden="true" tabindex="-1"></a>df_pred1<span class="sc">$</span>pred4 <span class="ot">&lt;-</span> mod4<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_pred1)</span>
+<span id="cb11-9"><a href="mrbrt.html#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y1))</span>
+<span id="cb11-10"><a href="mrbrt.html#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred1, <span class="fu">lines</span>(x1, pred4))</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+</div>
+<div id="section3" class="section level2" number="3.4">
+<h2><span class="header-section-number">3.4</span> Removing the effects of outliers with trimming</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="mrbrt.html#cb12-1" aria-hidden="true" tabindex="-1"></a>dat2 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb12-2"><a href="mrbrt.html#cb12-2" aria-hidden="true" tabindex="-1"></a>dat2<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb12-3"><a href="mrbrt.html#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim2,  <span class="at">col_obs =</span> <span class="st">&quot;y1&quot;</span>, <span class="at">col_obs_se =</span> <span class="st">&quot;y1_se&quot;</span>,</span>
+<span id="cb12-4"><a href="mrbrt.html#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;x1&quot;</span>), <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span> )</span>
+<span id="cb12-5"><a href="mrbrt.html#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="mrbrt.html#cb12-6" aria-hidden="true" tabindex="-1"></a>df_pred2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="dv">2</span>))</span>
+<span id="cb12-7"><a href="mrbrt.html#cb12-7" aria-hidden="true" tabindex="-1"></a>dat_pred2 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb12-8"><a href="mrbrt.html#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="mrbrt.html#cb12-9" aria-hidden="true" tabindex="-1"></a>dat_pred2<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb12-10"><a href="mrbrt.html#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_pred2,</span>
+<span id="cb12-11"><a href="mrbrt.html#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs=</span><span class="fu">list</span>(<span class="st">&#39;x1&#39;</span>)</span>
+<span id="cb12-12"><a href="mrbrt.html#cb12-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="mrbrt.html#cb13-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb13-2"><a href="mrbrt.html#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat2,</span>
+<span id="cb13-3"><a href="mrbrt.html#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb13-4"><a href="mrbrt.html#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;intercept&quot;</span>, <span class="at">use_re =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb13-5"><a href="mrbrt.html#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;x1&quot;</span>) ),</span>
+<span id="cb13-6"><a href="mrbrt.html#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">inlier_pct =</span> <span class="fl">0.9</span>)</span>
+<span id="cb13-7"><a href="mrbrt.html#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="mrbrt.html#cb13-8" aria-hidden="true" tabindex="-1"></a>mod2<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb13-9"><a href="mrbrt.html#cb13-9" aria-hidden="true" tabindex="-1"></a>pred4 <span class="ot">&lt;-</span> mod2<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_pred2)</span>
+<span id="cb13-10"><a href="mrbrt.html#cb13-10" aria-hidden="true" tabindex="-1"></a>df_pred2<span class="sc">$</span>pred4 <span class="ot">&lt;-</span> pred4</span>
+<span id="cb13-11"><a href="mrbrt.html#cb13-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-12"><a href="mrbrt.html#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="co"># get a data frame with estimated weights</span></span>
+<span id="cb13-13"><a href="mrbrt.html#cb13-13" aria-hidden="true" tabindex="-1"></a>df_mod2 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(mod2<span class="sc">$</span>data<span class="sc">$</span><span class="fu">to_df</span>(), <span class="fu">data.frame</span>(<span class="at">w =</span> mod2<span class="sc">$</span>w_soln))</span>
+<span id="cb13-14"><a href="mrbrt.html#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="mrbrt.html#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_mod2, <span class="fu">plot</span>(</span>
+<span id="cb13-16"><a href="mrbrt.html#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> x1, <span class="at">y =</span> obs,  </span>
+<span id="cb13-17"><a href="mrbrt.html#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">ifelse</span>(w <span class="sc">==</span> <span class="dv">1</span>, <span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>),  </span>
+<span id="cb13-18"><a href="mrbrt.html#cb13-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">pch =</span> <span class="fu">ifelse</span>(w <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">16</span>)</span>
+<span id="cb13-19"><a href="mrbrt.html#cb13-19" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb13-20"><a href="mrbrt.html#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred2, <span class="fu">lines</span>(x1, pred4))</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+</div>
+<div id="section4" class="section level2" number="3.5">
+<h2><span class="header-section-number">3.5</span> Splines</h2>
+<div id="section4_1" class="section level3" number="3.5.1">
+<h3><span class="header-section-number">3.5.1</span> - Setting priors and shape constraints on splines</h3>
+<ul>
+<li><p><code>spline_l_linear</code> and <code>spline_r_linear</code> make the left and right tail segments linear, respectively</p></li>
+<li><p><code>prior_spline_monotonicity</code> forces the spline to be “increasing” or “decreasing”</p></li>
+<li><p><code>prior_spline_convexity</code> makes the spline “convex” or “concave”</p></li>
+<li><p><code>prior_spline_maxder_gaussian = array(c(0, 0.03))</code> has the effect of putting a dampening prior on the spline, making the highest-order derivative of each segment subject to a <span class="math inline">\(N(0, 0.03^2)\)</span> Gaussian prior. This makes a cubic spline more quadratic, quadratic more linear, etc.</p></li>
+<li><p>When <code>spline_l_linear</code> and <code>spline_r_linear</code> are set to <code>TRUE</code>, the value given to <code>prior_spline_maxder_gaussian</code> for those segments is a direct prior on the slope of the segment. For example, <code>prior_spline_maxder_gaussian = rbind(c(0,0,0,0,-1), c(Inf,Inf,Inf,Inf,0.0001))</code> makes the slope of the right tail very close to <code>-1</code> when <code>spline_r_linear = TRUE</code>. Note that the function takes a matrix as an input, where the first row is a vector a prior means and the second row is a vector of prior standard deviations. The number of columns must match the number of knots minus 1.</p></li>
+</ul>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="mrbrt.html#cb14-1" aria-hidden="true" tabindex="-1"></a>dat3 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb14-2"><a href="mrbrt.html#cb14-2" aria-hidden="true" tabindex="-1"></a>dat3<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb14-3"><a href="mrbrt.html#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim1, <span class="at">col_obs =</span> <span class="st">&quot;y2&quot;</span>, <span class="at">col_obs_se =</span> <span class="st">&quot;y2_se&quot;</span>,</span>
+<span id="cb14-4"><a href="mrbrt.html#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;x1&quot;</span>), <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span> )</span>
+<span id="cb14-5"><a href="mrbrt.html#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="mrbrt.html#cb14-6" aria-hidden="true" tabindex="-1"></a>mod5 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb14-7"><a href="mrbrt.html#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat3,</span>
+<span id="cb14-8"><a href="mrbrt.html#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb14-9"><a href="mrbrt.html#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;intercept&quot;</span>, <span class="at">use_re =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-10"><a href="mrbrt.html#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(</span>
+<span id="cb14-11"><a href="mrbrt.html#cb14-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">alt_cov =</span> <span class="st">&quot;x1&quot;</span>,</span>
+<span id="cb14-12"><a href="mrbrt.html#cb14-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">use_spline =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-13"><a href="mrbrt.html#cb14-13" aria-hidden="true" tabindex="-1"></a>      <span class="co"># spline_knots = array(c(0, 0.25, 0.5, 0.75, 1)),</span></span>
+<span id="cb14-14"><a href="mrbrt.html#cb14-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_knots =</span> <span class="fu">array</span>(<span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">by =</span> <span class="fl">0.2</span>)),</span>
+<span id="cb14-15"><a href="mrbrt.html#cb14-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_degree =</span> 3L,</span>
+<span id="cb14-16"><a href="mrbrt.html#cb14-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_knots_type =</span> <span class="st">&#39;frequency&#39;</span>,</span>
+<span id="cb14-17"><a href="mrbrt.html#cb14-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_r_linear =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb14-18"><a href="mrbrt.html#cb14-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_l_linear =</span> <span class="cn">FALSE</span></span>
+<span id="cb14-19"><a href="mrbrt.html#cb14-19" aria-hidden="true" tabindex="-1"></a>      <span class="co"># prior_spline_monotonicity = &#39;increasing&#39;</span></span>
+<span id="cb14-20"><a href="mrbrt.html#cb14-20" aria-hidden="true" tabindex="-1"></a>      <span class="co"># prior_spline_convexity = &quot;convex&quot;</span></span>
+<span id="cb14-21"><a href="mrbrt.html#cb14-21" aria-hidden="true" tabindex="-1"></a>      <span class="co"># prior_spline_maxder_gaussian = array(c(0, 0.01))</span></span>
+<span id="cb14-22"><a href="mrbrt.html#cb14-22" aria-hidden="true" tabindex="-1"></a>      <span class="co"># prior_spline_maxder_gaussian = rbind(c(0,0,0,0,-1), c(Inf,Inf,Inf,Inf,0.0001))</span></span>
+<span id="cb14-23"><a href="mrbrt.html#cb14-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-24"><a href="mrbrt.html#cb14-24" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb14-25"><a href="mrbrt.html#cb14-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-26"><a href="mrbrt.html#cb14-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-27"><a href="mrbrt.html#cb14-27" aria-hidden="true" tabindex="-1"></a>mod5<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb14-28"><a href="mrbrt.html#cb14-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="mrbrt.html#cb14-29" aria-hidden="true" tabindex="-1"></a><span class="co"># df_pred1 &lt;- data.frame(x1 = seq(0, 10, by = 2), study_id = &quot;4&quot;)</span></span>
+<span id="cb14-30"><a href="mrbrt.html#cb14-30" aria-hidden="true" tabindex="-1"></a>df_pred3 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.1</span>))</span>
+<span id="cb14-31"><a href="mrbrt.html#cb14-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-32"><a href="mrbrt.html#cb14-32" aria-hidden="true" tabindex="-1"></a>dat_pred3 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb14-33"><a href="mrbrt.html#cb14-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-34"><a href="mrbrt.html#cb14-34" aria-hidden="true" tabindex="-1"></a>dat_pred3<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb14-35"><a href="mrbrt.html#cb14-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_pred3, </span>
+<span id="cb14-36"><a href="mrbrt.html#cb14-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs=</span><span class="fu">list</span>(<span class="st">&#39;x1&#39;</span>)</span>
+<span id="cb14-37"><a href="mrbrt.html#cb14-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-38"><a href="mrbrt.html#cb14-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-39"><a href="mrbrt.html#cb14-39" aria-hidden="true" tabindex="-1"></a>pred5 <span class="ot">&lt;-</span> mod5<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_pred3)</span>
+<span id="cb14-40"><a href="mrbrt.html#cb14-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-41"><a href="mrbrt.html#cb14-41" aria-hidden="true" tabindex="-1"></a>df_pred3<span class="sc">$</span>pred5 <span class="ot">&lt;-</span> pred5</span>
+<span id="cb14-42"><a href="mrbrt.html#cb14-42" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y2))</span>
+<span id="cb14-43"><a href="mrbrt.html#cb14-43" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred3, <span class="fu">lines</span>(x1, pred5))</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+</div>
+<div id="section4_2" class="section level3" number="3.5.2">
+<h3><span class="header-section-number">3.5.2</span> - Ensemble splines</h3>
+<p>Arguments for the <code>sample_knots()</code> function (from <code>py_help(utils$sample_knots)</code> in an interactive session):</p>
+<pre><code>Args:
+    num_intervals (int): Number of intervals (number of knots minus 1).
+    knot_bounds (np.ndarray | None, optional):
+        Bounds for the interior knots. Here we assume the domain span 0 to 1,
+        bound for a knot should be between 0 and 1, e.g. [0.1, 0.2].
+        `knot_bounds` should have number of interior knots of rows, and each row
+        is a bound for corresponding knot, e.g.
+            `knot_bounds=np.array([[0.0, 0.2], [0.3, 0.4], [0.3, 1.0]])`,
+        for when we have three interior knots.
+    interval_sizes (np.ndarray | None, optional):
+        Bounds for the distances between knots. For the same reason, we assume
+        elements in `interval_sizes` to be between 0 and 1. For example,
+            `interval_distances=np.array([[0.1, 0.2], [0.1, 0.3], [0.1, 0.5], [0.1, 0.5]])`
+        means that the distance between first (0) and second knot has to be between 0.1 and 0.2, etc.
+        And the number of rows for `interval_sizes` has to be same with `num_intervals`.
+    num_samples (int): Number of knots samples.</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="mrbrt.html#cb16-1" aria-hidden="true" tabindex="-1"></a>dat4 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb16-2"><a href="mrbrt.html#cb16-2" aria-hidden="true" tabindex="-1"></a>dat4<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb16-3"><a href="mrbrt.html#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim1, <span class="at">col_obs =</span> <span class="st">&quot;y2&quot;</span>, <span class="at">col_obs_se =</span> <span class="st">&quot;y2_se&quot;</span>,</span>
+<span id="cb16-4"><a href="mrbrt.html#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;x1&quot;</span>), <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span> )</span>
+<span id="cb16-5"><a href="mrbrt.html#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="mrbrt.html#cb16-6" aria-hidden="true" tabindex="-1"></a>knots_samples <span class="ot">&lt;-</span> utils<span class="sc">$</span><span class="fu">sample_knots</span>(</span>
+<span id="cb16-7"><a href="mrbrt.html#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_intervals =</span> 3L, </span>
+<span id="cb16-8"><a href="mrbrt.html#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">knot_bounds =</span> <span class="fu">rbind</span>(<span class="fu">c</span>(<span class="fl">0.0</span>, <span class="fl">0.4</span>), <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">1.0</span>)),</span>
+<span id="cb16-9"><a href="mrbrt.html#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_samples =</span> 20L</span>
+<span id="cb16-10"><a href="mrbrt.html#cb16-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-11"><a href="mrbrt.html#cb16-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-12"><a href="mrbrt.html#cb16-12" aria-hidden="true" tabindex="-1"></a>ensemble_cov_model1 <span class="ot">&lt;-</span> <span class="fu">LinearCovModel</span>(</span>
+<span id="cb16-13"><a href="mrbrt.html#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">alt_cov =</span> <span class="st">&quot;x1&quot;</span>,</span>
+<span id="cb16-14"><a href="mrbrt.html#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">use_spline =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb16-15"><a href="mrbrt.html#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">spline_knots =</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.33</span>, <span class="fl">0.66</span>, <span class="dv">1</span>)),</span>
+<span id="cb16-16"><a href="mrbrt.html#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">spline_degree =</span> 3L,</span>
+<span id="cb16-17"><a href="mrbrt.html#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">spline_knots_type =</span> <span class="st">&#39;frequency&#39;</span></span>
+<span id="cb16-18"><a href="mrbrt.html#cb16-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-19"><a href="mrbrt.html#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="mrbrt.html#cb16-20" aria-hidden="true" tabindex="-1"></a>mod5a <span class="ot">&lt;-</span> <span class="fu">MRBeRT</span>(</span>
+<span id="cb16-21"><a href="mrbrt.html#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat3,</span>
+<span id="cb16-22"><a href="mrbrt.html#cb16-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">ensemble_cov_model =</span> ensemble_cov_model1,</span>
+<span id="cb16-23"><a href="mrbrt.html#cb16-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">ensemble_knots =</span> knots_samples,</span>
+<span id="cb16-24"><a href="mrbrt.html#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb16-25"><a href="mrbrt.html#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LinearCovModel</span>(<span class="st">&quot;intercept&quot;</span>, <span class="at">use_re =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb16-26"><a href="mrbrt.html#cb16-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb16-27"><a href="mrbrt.html#cb16-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-28"><a href="mrbrt.html#cb16-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-29"><a href="mrbrt.html#cb16-29" aria-hidden="true" tabindex="-1"></a>mod5a<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb16-30"><a href="mrbrt.html#cb16-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-31"><a href="mrbrt.html#cb16-31" aria-hidden="true" tabindex="-1"></a><span class="co"># df_pred1 &lt;- data.frame(x1 = seq(0, 10, by = 2), study_id = &quot;4&quot;)</span></span>
+<span id="cb16-32"><a href="mrbrt.html#cb16-32" aria-hidden="true" tabindex="-1"></a>df_pred3 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x1 =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.1</span>))</span>
+<span id="cb16-33"><a href="mrbrt.html#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-34"><a href="mrbrt.html#cb16-34" aria-hidden="true" tabindex="-1"></a>dat_pred3 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb16-35"><a href="mrbrt.html#cb16-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-36"><a href="mrbrt.html#cb16-36" aria-hidden="true" tabindex="-1"></a>dat_pred3<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb16-37"><a href="mrbrt.html#cb16-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_pred3, </span>
+<span id="cb16-38"><a href="mrbrt.html#cb16-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs=</span><span class="fu">list</span>(<span class="st">&#39;x1&#39;</span>)</span>
+<span id="cb16-39"><a href="mrbrt.html#cb16-39" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-40"><a href="mrbrt.html#cb16-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-41"><a href="mrbrt.html#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="co"># this predicts a weighted average from the spline ensemble</span></span>
+<span id="cb16-42"><a href="mrbrt.html#cb16-42" aria-hidden="true" tabindex="-1"></a>pred5a <span class="ot">&lt;-</span> mod5a<span class="sc">$</span><span class="fu">predict</span>(<span class="at">data =</span> dat_pred3)</span>
+<span id="cb16-43"><a href="mrbrt.html#cb16-43" aria-hidden="true" tabindex="-1"></a>df_pred3<span class="sc">$</span>pred5a <span class="ot">&lt;-</span> pred5a</span>
+<span id="cb16-44"><a href="mrbrt.html#cb16-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-45"><a href="mrbrt.html#cb16-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-46"><a href="mrbrt.html#cb16-46" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim1, <span class="fu">plot</span>(x1, y2))</span>
+<span id="cb16-47"><a href="mrbrt.html#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred3, <span class="fu">lines</span>(x1, pred5a))</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="mrbrt.html#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # view all splines in the ensemble</span></span>
+<span id="cb17-2"><a href="mrbrt.html#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
+<span id="cb17-3"><a href="mrbrt.html#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># pred5a &lt;- mod5a$predict(data = dat_pred3, return_avg = FALSE)</span></span>
+<span id="cb17-4"><a href="mrbrt.html#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb17-5"><a href="mrbrt.html#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co"># with(df_sim1, plot(x1, y2))</span></span>
+<span id="cb17-6"><a href="mrbrt.html#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># for (i in 1:nrow(pred5a)) {</span></span>
+<span id="cb17-7"><a href="mrbrt.html#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   tmp &lt;- pred5a[i, ]</span></span>
+<span id="cb17-8"><a href="mrbrt.html#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   with(df_pred3, lines(x1, tmp))</span></span>
+<span id="cb17-9"><a href="mrbrt.html#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="co"># }</span></span>
+<span id="cb17-10"><a href="mrbrt.html#cb17-10" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span></code></pre></div>
+<p><br><br></p>
+</div>
+</div>
+<div id="section5" class="section level2" number="3.6">
+<h2><span class="header-section-number">3.6</span> The ratio model</h2>
+<p>This model is useful when a covariate is represented as a range. For example, often population-level data are indexed by age group. We can represent this in the model as <code>alt_cov = c("age_start", "age_end")</code>. Or if a relative risk estimate corresponds to a comparison of two BMI ranges, we specify the model as <code>alt_cov = c("b_0", "b_1")</code> and <code>ref_cov = c("a_0", "a_1")</code>. When predicting out, we need to set a constant reference level and varying alternative level.</p>
+<p>For <code>LogCovModel</code>, our regression model can be represented as</p>
+<p><span class="math inline">\(y = ln(1 + X_{alt}\beta) - ln(1 + X_{ref}\beta)\)</span>,</p>
+<p>where $X_{alt} and $X_{ref} are the design matrix for the alternative and reference groups. They could be either covariates or the spline design matrices from the covariates.</p>
+<p>When we want to include the random effects, we always assume a random “slope,”</p>
+<p><span class="math inline">\(y = (\frac{ln(1 + X_{alt}\beta) - ln(1 + X_{ref}\beta)}{X_{alt}-X_{ref}} + u)(X_{alt}-X_{ref})\)</span></p>
+<p>For ratio model it doesn’t need ‘intercept,’ due to the reason of we are considering relative risk, where measurement is invariant with the scaling of the curve.</p>
+<p>In the ratio model, if we set <code>use_re=True</code>, we automatically turn on the <code>use_re_mid_point</code>, since for log relative risk, we always consider the random effects as the random average slope.</p>
+<p>We use spline to parameterize the relative risk curve in the linear space, and all the shape constraints are in linear space.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="mrbrt.html#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># creating simulated data with exposure ranges</span></span>
+<span id="cb18-2"><a href="mrbrt.html#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb18-3"><a href="mrbrt.html#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="mrbrt.html#cb18-4" aria-hidden="true" tabindex="-1"></a>df_sim3 <span class="ot">&lt;-</span> <span class="fu">do.call</span>(<span class="st">&quot;rbind&quot;</span>, <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_sim1), <span class="cf">function</span>(i) {</span>
+<span id="cb18-5"><a href="mrbrt.html#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># i &lt;- 1 # dev</span></span>
+<span id="cb18-6"><a href="mrbrt.html#cb18-6" aria-hidden="true" tabindex="-1"></a>  x_offset <span class="ot">&lt;-</span> <span class="fl">0.1</span></span>
+<span id="cb18-7"><a href="mrbrt.html#cb18-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-8"><a href="mrbrt.html#cb18-8" aria-hidden="true" tabindex="-1"></a>  row_j <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(df_sim1), <span class="dv">1</span>)</span>
+<span id="cb18-9"><a href="mrbrt.html#cb18-9" aria-hidden="true" tabindex="-1"></a>  df_i <span class="ot">&lt;-</span> df_sim1[i, ]</span>
+<span id="cb18-10"><a href="mrbrt.html#cb18-10" aria-hidden="true" tabindex="-1"></a>  df_j <span class="ot">&lt;-</span> df_sim1[row_j, ]</span>
+<span id="cb18-11"><a href="mrbrt.html#cb18-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-12"><a href="mrbrt.html#cb18-12" aria-hidden="true" tabindex="-1"></a>  df_k <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb18-13"><a href="mrbrt.html#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">row_i =</span> i,</span>
+<span id="cb18-14"><a href="mrbrt.html#cb18-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">row_j =</span> row_j,</span>
+<span id="cb18-15"><a href="mrbrt.html#cb18-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">a_0 =</span> df_i<span class="sc">$</span>x1 <span class="sc">-</span> x_offset, <span class="at">a_1 =</span> df_i<span class="sc">$</span>x1 <span class="sc">+</span> x_offset,</span>
+<span id="cb18-16"><a href="mrbrt.html#cb18-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">b_0 =</span> df_j<span class="sc">$</span>x1 <span class="sc">-</span> x_offset, <span class="at">b_1 =</span> df_j<span class="sc">$</span>x1 <span class="sc">+</span> x_offset,</span>
+<span id="cb18-17"><a href="mrbrt.html#cb18-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">log_rr =</span> df_j<span class="sc">$</span>y2 <span class="sc">-</span> df_i<span class="sc">$</span>y2,</span>
+<span id="cb18-18"><a href="mrbrt.html#cb18-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">log_rr_se =</span> <span class="dv">1</span></span>
+<span id="cb18-19"><a href="mrbrt.html#cb18-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb18-20"><a href="mrbrt.html#cb18-20" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb18-21"><a href="mrbrt.html#cb18-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df_k)</span>
+<span id="cb18-22"><a href="mrbrt.html#cb18-22" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb18-23"><a href="mrbrt.html#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-24"><a href="mrbrt.html#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_sim3)</span></code></pre></div>
+<pre><code>##   row_i row_j       a_0       a_1       b_0      b_1     log_rr log_rr_se
+## 1     1     4 0.1333120 0.3333120 0.8946616 1.094662 -2.2685790         1
+## 2     2    39 0.6067905 0.8067905 7.5631067 7.763107  1.7740129         1
+## 3     3     1 0.7424691 0.9424691 0.1333120 0.333312  0.7702523         1
+## 4     4    34 0.8946616 1.0946616 6.8273156 7.027316  2.9571547         1
+## 5     5    23 1.1169192 1.3169192 4.4906573 4.690657  0.3822077         1
+## 6     6    43 1.3330438 1.5330438 8.1094629 8.309463  3.5768230         1</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="mrbrt.html#cb20-1" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb20-2"><a href="mrbrt.html#cb20-2" aria-hidden="true" tabindex="-1"></a>dat1<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb20-3"><a href="mrbrt.html#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim3,  <span class="at">col_obs =</span> <span class="st">&quot;log_rr&quot;</span>, <span class="at">col_obs_se =</span> <span class="st">&quot;log_rr_se&quot;</span>,</span>
+<span id="cb20-4"><a href="mrbrt.html#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;a_0&quot;</span>, <span class="st">&quot;a_1&quot;</span>, <span class="st">&quot;b_0&quot;</span>, <span class="st">&quot;b_1&quot;</span>) )</span>
+<span id="cb20-5"><a href="mrbrt.html#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="mrbrt.html#cb20-6" aria-hidden="true" tabindex="-1"></a>mod6 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb20-7"><a href="mrbrt.html#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat1,</span>
+<span id="cb20-8"><a href="mrbrt.html#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> <span class="fu">list</span>(</span>
+<span id="cb20-9"><a href="mrbrt.html#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">LogCovModel</span>(</span>
+<span id="cb20-10"><a href="mrbrt.html#cb20-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">alt_cov =</span> <span class="fu">c</span>(<span class="st">&quot;b_0&quot;</span>, <span class="st">&quot;b_1&quot;</span>),</span>
+<span id="cb20-11"><a href="mrbrt.html#cb20-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">ref_cov =</span> <span class="fu">c</span>(<span class="st">&quot;a_0&quot;</span>, <span class="st">&quot;a_1&quot;</span>),</span>
+<span id="cb20-12"><a href="mrbrt.html#cb20-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">use_re =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb20-13"><a href="mrbrt.html#cb20-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">use_spline =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb20-14"><a href="mrbrt.html#cb20-14" aria-hidden="true" tabindex="-1"></a>      <span class="co"># spline_knots = array(seq(0, 1, by = 0.2)),</span></span>
+<span id="cb20-15"><a href="mrbrt.html#cb20-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_knots =</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.25</span>, <span class="fl">0.5</span>, <span class="fl">0.75</span>, <span class="dv">1</span>)),</span>
+<span id="cb20-16"><a href="mrbrt.html#cb20-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_degree =</span> 3L,</span>
+<span id="cb20-17"><a href="mrbrt.html#cb20-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">spline_knots_type =</span> <span class="st">&#39;frequency&#39;</span>,</span>
+<span id="cb20-18"><a href="mrbrt.html#cb20-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">name =</span> <span class="st">&quot;exposure&quot;</span></span>
+<span id="cb20-19"><a href="mrbrt.html#cb20-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-20"><a href="mrbrt.html#cb20-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-21"><a href="mrbrt.html#cb20-21" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-22"><a href="mrbrt.html#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-23"><a href="mrbrt.html#cb20-23" aria-hidden="true" tabindex="-1"></a>mod6<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_print_level =</span> 5L, <span class="at">inner_max_iter =</span> 1000L)</span>
+<span id="cb20-24"><a href="mrbrt.html#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="mrbrt.html#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co"># df_pred6 &lt;- data.frame(exposure = seq(0, 10, by = 2), study_id = &quot;4&quot;)</span></span>
+<span id="cb20-26"><a href="mrbrt.html#cb20-26" aria-hidden="true" tabindex="-1"></a>df_pred6 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb20-27"><a href="mrbrt.html#cb20-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">b_0 =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.1</span>),</span>
+<span id="cb20-28"><a href="mrbrt.html#cb20-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">b_1 =</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">10</span>, <span class="at">by =</span> <span class="fl">0.1</span>) ) <span class="sc">%&gt;%</span></span>
+<span id="cb20-29"><a href="mrbrt.html#cb20-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">a_0 =</span> <span class="dv">0</span>, <span class="at">a_1 =</span> <span class="dv">0</span> )</span>
+<span id="cb20-30"><a href="mrbrt.html#cb20-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-31"><a href="mrbrt.html#cb20-31" aria-hidden="true" tabindex="-1"></a>dat_pred6 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb20-32"><a href="mrbrt.html#cb20-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-33"><a href="mrbrt.html#cb20-33" aria-hidden="true" tabindex="-1"></a>dat_pred6<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb20-34"><a href="mrbrt.html#cb20-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_pred6, </span>
+<span id="cb20-35"><a href="mrbrt.html#cb20-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs=</span><span class="fu">list</span>(<span class="st">&#39;a_0&#39;</span>, <span class="st">&#39;a_1&#39;</span>, <span class="st">&#39;b_0&#39;</span>, <span class="st">&#39;b_1&#39;</span>)</span>
+<span id="cb20-36"><a href="mrbrt.html#cb20-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># col_covs=list(&quot;exposure&quot;)</span></span>
+<span id="cb20-37"><a href="mrbrt.html#cb20-37" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-38"><a href="mrbrt.html#cb20-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-39"><a href="mrbrt.html#cb20-39" aria-hidden="true" tabindex="-1"></a>pred6 <span class="ot">&lt;-</span> mod6<span class="sc">$</span><span class="fu">predict</span>(dat_pred6)</span>
+<span id="cb20-40"><a href="mrbrt.html#cb20-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-41"><a href="mrbrt.html#cb20-41" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_sim3, <span class="fu">plot</span>(b_0, log_rr))</span>
+<span id="cb20-42"><a href="mrbrt.html#cb20-42" aria-hidden="true" tabindex="-1"></a><span class="fu">with</span>(df_pred6, <span class="fu">lines</span>(b_0, pred6))</span></code></pre></div>
+<p><img src="bookdown-demo_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><br><br></p>
+</div>
+<div id="section6" class="section level2" number="3.7">
+<h2><span class="header-section-number">3.7</span> Automated covariate selection</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="mrbrt.html#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create simulated data</span></span>
+<span id="cb21-2"><a href="mrbrt.html#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb21-3"><a href="mrbrt.html#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="mrbrt.html#cb21-4" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="fl">1.2</span>, <span class="dv">0</span>, <span class="fl">1.5</span>, <span class="dv">0</span>)</span>
+<span id="cb21-5"><a href="mrbrt.html#cb21-5" aria-hidden="true" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">7</span>)</span>
+<span id="cb21-6"><a href="mrbrt.html#cb21-6" aria-hidden="true" tabindex="-1"></a>num_obs <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb21-7"><a href="mrbrt.html#cb21-7" aria-hidden="true" tabindex="-1"></a>obs_se <span class="ot">=</span> <span class="fl">0.1</span></span>
+<span id="cb21-8"><a href="mrbrt.html#cb21-8" aria-hidden="true" tabindex="-1"></a>studies <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>)</span>
+<span id="cb21-9"><a href="mrbrt.html#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="mrbrt.html#cb21-10" aria-hidden="true" tabindex="-1"></a>covs <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb21-11"><a href="mrbrt.html#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rep</span>(<span class="dv">1</span>, num_obs),</span>
+<span id="cb21-12"><a href="mrbrt.html#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(<span class="st">&quot;cbind&quot;</span>, <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(beta)<span class="sc">-</span><span class="dv">1</span>), <span class="cf">function</span>(i) <span class="fu">rnorm</span>(num_obs)))</span>
+<span id="cb21-13"><a href="mrbrt.html#cb21-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-14"><a href="mrbrt.html#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="mrbrt.html#cb21-15" aria-hidden="true" tabindex="-1"></a>obs <span class="ot">&lt;-</span> covs <span class="sc">%*%</span> beta <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="at">n =</span> num_obs, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> obs_se)</span>
+<span id="cb21-16"><a href="mrbrt.html#cb21-16" aria-hidden="true" tabindex="-1"></a>df_sim4 <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(<span class="fu">do.call</span>(<span class="st">&quot;cbind&quot;</span>, <span class="fu">list</span>(obs, <span class="fu">rep</span>(obs_se, num_obs), covs))) <span class="sc">%&gt;%</span></span>
+<span id="cb21-17"><a href="mrbrt.html#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>V3)</span>
+<span id="cb21-18"><a href="mrbrt.html#cb21-18" aria-hidden="true" tabindex="-1"></a>cov_names <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;cov&quot;</span>, <span class="dv">1</span><span class="sc">:</span>(<span class="fu">length</span>(beta)<span class="sc">-</span><span class="dv">1</span>))</span>
+<span id="cb21-19"><a href="mrbrt.html#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(df_sim4) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;obs&quot;</span>, <span class="st">&quot;obs_se&quot;</span>, cov_names)</span>
+<span id="cb21-20"><a href="mrbrt.html#cb21-20" aria-hidden="true" tabindex="-1"></a>df_sim4<span class="sc">$</span>study_id <span class="ot">&lt;-</span> <span class="fu">sample</span>(studies, num_obs, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-21"><a href="mrbrt.html#cb21-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-22"><a href="mrbrt.html#cb21-22" aria-hidden="true" tabindex="-1"></a>mrdata <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb21-23"><a href="mrbrt.html#cb21-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-24"><a href="mrbrt.html#cb21-24" aria-hidden="true" tabindex="-1"></a>mrdata<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb21-25"><a href="mrbrt.html#cb21-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim4, </span>
+<span id="cb21-26"><a href="mrbrt.html#cb21-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_obs =</span> <span class="st">&#39;obs&#39;</span>, </span>
+<span id="cb21-27"><a href="mrbrt.html#cb21-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_obs_se =</span> <span class="st">&#39;obs_se&#39;</span>, </span>
+<span id="cb21-28"><a href="mrbrt.html#cb21-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_study_id =</span> <span class="st">&#39;study_id&#39;</span>, </span>
+<span id="cb21-29"><a href="mrbrt.html#cb21-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">as.list</span>(cov_names)</span>
+<span id="cb21-30"><a href="mrbrt.html#cb21-30" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-31"><a href="mrbrt.html#cb21-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-32"><a href="mrbrt.html#cb21-32" aria-hidden="true" tabindex="-1"></a>candidate_covs <span class="ot">&lt;-</span> cov_names[<span class="sc">!</span>cov_names <span class="sc">==</span> <span class="st">&quot;cov1&quot;</span>]</span>
+<span id="cb21-33"><a href="mrbrt.html#cb21-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-34"><a href="mrbrt.html#cb21-34" aria-hidden="true" tabindex="-1"></a>covfinder <span class="ot">&lt;-</span> <span class="fu">CovFinder</span>(</span>
+<span id="cb21-35"><a href="mrbrt.html#cb21-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mrdata, </span>
+<span id="cb21-36"><a href="mrbrt.html#cb21-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">covs =</span> <span class="fu">as.list</span>(candidate_covs),</span>
+<span id="cb21-37"><a href="mrbrt.html#cb21-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">pre_selected_covs =</span> <span class="fu">list</span>(<span class="st">&quot;cov1&quot;</span>), </span>
+<span id="cb21-38"><a href="mrbrt.html#cb21-38" aria-hidden="true" tabindex="-1"></a>  <span class="at">normalized_covs =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb21-39"><a href="mrbrt.html#cb21-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">num_samples =</span> 1000L, </span>
+<span id="cb21-40"><a href="mrbrt.html#cb21-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">power_range =</span> <span class="fu">list</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>), </span>
+<span id="cb21-41"><a href="mrbrt.html#cb21-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">power_step_size =</span> <span class="dv">1</span>, </span>
+<span id="cb21-42"><a href="mrbrt.html#cb21-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">laplace_threshold =</span> <span class="fl">1e-5</span></span>
+<span id="cb21-43"><a href="mrbrt.html#cb21-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-44"><a href="mrbrt.html#cb21-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-45"><a href="mrbrt.html#cb21-45" aria-hidden="true" tabindex="-1"></a>covfinder<span class="sc">$</span><span class="fu">select_covs</span>(<span class="at">verbose =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-46"><a href="mrbrt.html#cb21-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-47"><a href="mrbrt.html#cb21-47" aria-hidden="true" tabindex="-1"></a>covfinder<span class="sc">$</span>selected_covs</span></code></pre></div>
+<pre><code>## [1] &quot;cov1&quot; &quot;cov3&quot; &quot;cov5&quot;</code></pre>
+<p><br><br></p>
+</div>
+<div id="section7" class="section level2" number="3.8">
+<h2><span class="header-section-number">3.8</span> Calculating an evidence score</h2>
+<p>For documentation on the <code>Scorelator</code> function, see <code>py_help(evidence_score$Scorelator)</code> or go to <a href="https://github.com/ihmeuw-msca/MRTool/blob/5078ded1f22a99fd733ffd15de258cc407a8f4fd/src/mrtool/evidence_score/scorelator.py" class="uri">https://github.com/ihmeuw-msca/MRTool/blob/5078ded1f22a99fd733ffd15de258cc407a8f4fd/src/mrtool/evidence_score/scorelator.py</a>.</p>
+<p>The code below creates a dataset for simulating the effect of a dichotomous risk factor, fits a MR-BRT model on it, and calculates an evidence score. Note that continuous risk factors will want to specify <code>score_type = "area"</code> in the <code>evidence_score$Scorelator()</code> function.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="mrbrt.html#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create simulated data, run model and get draws </span></span>
+<span id="cb23-2"><a href="mrbrt.html#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># for passing to the Scorelator function</span></span>
+<span id="cb23-3"><a href="mrbrt.html#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="mrbrt.html#cb23-4" aria-hidden="true" tabindex="-1"></a>df_sim7_in <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;/ihme/code/mscm/R/example_data/linear_sim_evidence_score_0_0.5.csv&quot;</span>)</span>
+<span id="cb23-5"><a href="mrbrt.html#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="mrbrt.html#cb23-6" aria-hidden="true" tabindex="-1"></a>cutoff <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">quantile</span>(df_sim7_in<span class="sc">$</span>b_1, <span class="at">probs =</span> <span class="fl">0.3</span>), <span class="dv">2</span>)</span>
+<span id="cb23-7"><a href="mrbrt.html#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="mrbrt.html#cb23-8" aria-hidden="true" tabindex="-1"></a>df_sim7 <span class="ot">&lt;-</span> df_sim7_in <span class="sc">%&gt;%</span></span>
+<span id="cb23-9"><a href="mrbrt.html#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb23-10"><a href="mrbrt.html#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">a_mid =</span> (a_0 <span class="sc">+</span> a_1) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb23-11"><a href="mrbrt.html#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">b_mid =</span> (b_0 <span class="sc">+</span> b_1) <span class="sc">/</span> <span class="dv">2</span>,</span>
+<span id="cb23-12"><a href="mrbrt.html#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">ref =</span> <span class="fu">ifelse</span>(a_mid <span class="sc">&lt;=</span> cutoff, <span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb23-13"><a href="mrbrt.html#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">alt =</span> <span class="fu">ifelse</span>(b_mid <span class="sc">&lt;=</span> cutoff, <span class="dv">0</span>, <span class="dv">1</span>) ) <span class="sc">%&gt;%</span></span>
+<span id="cb23-14"><a href="mrbrt.html#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ref <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> alt <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb23-15"><a href="mrbrt.html#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="mrbrt.html#cb23-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-17"><a href="mrbrt.html#cb23-17" aria-hidden="true" tabindex="-1"></a>dat_sim7 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb23-18"><a href="mrbrt.html#cb23-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-19"><a href="mrbrt.html#cb23-19" aria-hidden="true" tabindex="-1"></a>dat_sim7<span class="sc">$</span><span class="fu">load_df</span>(</span>
+<span id="cb23-20"><a href="mrbrt.html#cb23-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df_sim7, </span>
+<span id="cb23-21"><a href="mrbrt.html#cb23-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_obs =</span> <span class="st">&quot;rr_log&quot;</span>, </span>
+<span id="cb23-22"><a href="mrbrt.html#cb23-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_obs_se =</span> <span class="st">&quot;rr_log_se&quot;</span>, </span>
+<span id="cb23-23"><a href="mrbrt.html#cb23-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;ref&quot;</span>, <span class="st">&quot;alt&quot;</span>), </span>
+<span id="cb23-24"><a href="mrbrt.html#cb23-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_study_id =</span> <span class="st">&quot;study_id&quot;</span></span>
+<span id="cb23-25"><a href="mrbrt.html#cb23-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-26"><a href="mrbrt.html#cb23-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-27"><a href="mrbrt.html#cb23-27" aria-hidden="true" tabindex="-1"></a>cov_models7 <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb23-28"><a href="mrbrt.html#cb23-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">LinearCovModel</span>(</span>
+<span id="cb23-29"><a href="mrbrt.html#cb23-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">alt_cov =</span> <span class="st">&quot;intercept&quot;</span>, </span>
+<span id="cb23-30"><a href="mrbrt.html#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_re =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb23-31"><a href="mrbrt.html#cb23-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">prior_beta_uniform =</span> <span class="fu">array</span>(<span class="fu">c</span>(<span class="fl">0.0</span>, <span class="cn">Inf</span>))</span>
+<span id="cb23-32"><a href="mrbrt.html#cb23-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-33"><a href="mrbrt.html#cb23-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-34"><a href="mrbrt.html#cb23-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-35"><a href="mrbrt.html#cb23-35" aria-hidden="true" tabindex="-1"></a>mod7 <span class="ot">&lt;-</span> <span class="fu">MRBRT</span>(</span>
+<span id="cb23-36"><a href="mrbrt.html#cb23-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat_sim7,</span>
+<span id="cb23-37"><a href="mrbrt.html#cb23-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_models =</span> cov_models7</span>
+<span id="cb23-38"><a href="mrbrt.html#cb23-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb23-39"><a href="mrbrt.html#cb23-39" aria-hidden="true" tabindex="-1"></a>mod7<span class="sc">$</span><span class="fu">fit_model</span>(<span class="at">inner_max_iter =</span> 1000L, <span class="at">inner_print_level =</span> 5L)</span>
+<span id="cb23-40"><a href="mrbrt.html#cb23-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-41"><a href="mrbrt.html#cb23-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-42"><a href="mrbrt.html#cb23-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-43"><a href="mrbrt.html#cb23-43" aria-hidden="true" tabindex="-1"></a>df_pred7 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">intercept =</span> <span class="dv">1</span>, <span class="at">ref =</span> <span class="dv">0</span>, <span class="at">alt =</span> <span class="dv">1</span>)</span>
+<span id="cb23-44"><a href="mrbrt.html#cb23-44" aria-hidden="true" tabindex="-1"></a>dat_pred7 <span class="ot">&lt;-</span> <span class="fu">MRData</span>()</span>
+<span id="cb23-45"><a href="mrbrt.html#cb23-45" aria-hidden="true" tabindex="-1"></a>dat_pred7<span class="sc">$</span><span class="fu">load_df</span>(<span class="at">data =</span> df_pred7, <span class="at">col_covs =</span> <span class="fu">list</span>(<span class="st">&quot;ref&quot;</span>, <span class="st">&quot;alt&quot;</span>))</span>
+<span id="cb23-46"><a href="mrbrt.html#cb23-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-47"><a href="mrbrt.html#cb23-47" aria-hidden="true" tabindex="-1"></a>samples7 <span class="ot">&lt;-</span> mod7<span class="sc">$</span><span class="fu">sample_soln</span>(<span class="at">sample_size =</span> 1000L)</span>
+<span id="cb23-48"><a href="mrbrt.html#cb23-48" aria-hidden="true" tabindex="-1"></a>beta_samples7 <span class="ot">&lt;-</span> samples7[[<span class="dv">1</span>]]</span>
+<span id="cb23-49"><a href="mrbrt.html#cb23-49" aria-hidden="true" tabindex="-1"></a>gamma_samples7 <span class="ot">&lt;-</span> samples7[[<span class="dv">2</span>]]</span>
+<span id="cb23-50"><a href="mrbrt.html#cb23-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-51"><a href="mrbrt.html#cb23-51" aria-hidden="true" tabindex="-1"></a>y_draws7 <span class="ot">&lt;-</span> mod7<span class="sc">$</span><span class="fu">create_draws</span>(</span>
+<span id="cb23-52"><a href="mrbrt.html#cb23-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> dat_pred7, </span>
+<span id="cb23-53"><a href="mrbrt.html#cb23-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_samples =</span> beta_samples7,</span>
+<span id="cb23-54"><a href="mrbrt.html#cb23-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma_samples =</span> gamma_samples7,</span>
+<span id="cb23-55"><a href="mrbrt.html#cb23-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">random_study =</span> <span class="cn">TRUE</span></span>
+<span id="cb23-56"><a href="mrbrt.html#cb23-56" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="mrbrt.html#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># using the scorelator</span></span>
+<span id="cb24-2"><a href="mrbrt.html#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="mrbrt.html#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># need to run &#39;repl_python()&#39; to open an interactive Python interpreter,</span></span>
+<span id="cb24-4"><a href="mrbrt.html#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># then immediately type &#39;exit&#39; to get back to the R interpreter</span></span>
+<span id="cb24-5"><a href="mrbrt.html#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co"># -- this helps to load a required Python package</span></span>
+<span id="cb24-6"><a href="mrbrt.html#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">repl_python</span>()</span>
+<span id="cb24-7"><a href="mrbrt.html#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="co"># -- type &#39;exit&#39; or hit escape</span></span>
+<span id="cb24-8"><a href="mrbrt.html#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="mrbrt.html#cb24-9" aria-hidden="true" tabindex="-1"></a>evidence_score <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">&quot;mrtool.evidence_score.scorelator&quot;</span>)</span>
+<span id="cb24-10"><a href="mrbrt.html#cb24-10" aria-hidden="true" tabindex="-1"></a>scorelator7 <span class="ot">&lt;-</span> evidence_score<span class="sc">$</span><span class="fu">Scorelator</span>(</span>
+<span id="cb24-11"><a href="mrbrt.html#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">ln_rr_draws =</span> <span class="fu">t</span>(y_draws7),</span>
+<span id="cb24-12"><a href="mrbrt.html#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">exposures =</span> <span class="fu">array</span>(<span class="dv">1</span>), </span>
+<span id="cb24-13"><a href="mrbrt.html#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">score_type =</span> <span class="st">&quot;point&quot;</span></span>
+<span id="cb24-14"><a href="mrbrt.html#cb24-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb24-15"><a href="mrbrt.html#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="mrbrt.html#cb24-16" aria-hidden="true" tabindex="-1"></a>score <span class="ot">&lt;-</span> scorelator7<span class="sc">$</span><span class="fu">get_evidence_score</span>(<span class="at">path_to_diagnostic=</span><span class="fu">file.path</span>(path_to_misc_outputs, <span class="st">&quot;tmp_score.pdf&quot;</span>))</span></code></pre></div>
+<p><br><br></p>
+</div>
+<div id="section9" class="section level2" number="3.9">
+<h2><span class="header-section-number">3.9</span> Frequently asked questions</h2>
+<ul>
+<li>How do I access the help documentation?</li>
+</ul>
+<p>In an interactive R session, type <code>py_help(...)</code> where <code>...</code> is the name of the function. This will show the Python docstring with information about required/optional arguments and a description of what they mean.</p>
+<ul>
+<li>Where should I go with questions?</li>
+</ul>
+<p>The #friends_of_mr_brt Slack channel is a good place to start for troubleshooting questions. It’s maintained by the Mathematical Sciences and Computational Algorithms (MSCA) team. If something requires a more in-depth discussion, feel free to sign up for a slot at office hours (#mscm-office-hours Slack channel).</p>
+<ul>
+<li>What does MR-BRT stand for?</li>
+</ul>
+<p>Meta-regression with Bayesian priors, Regularization and Trimming</p>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="quickstart.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="xwalk.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/02-mrbrt.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown-demo.pdf", "bookdown-demo.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

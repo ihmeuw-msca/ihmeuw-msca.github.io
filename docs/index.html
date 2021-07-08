@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Health Metrics Toolbox</title>
+  <meta name="description" content="A guide to statistical tools developed by IHME’s Math Sciences team, led by Aleksandr Aravkin and Peng Zheng" />
+  <meta name="generator" content="bookdown 0.22 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Health Metrics Toolbox" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="A guide to statistical tools developed by IHME’s Math Sciences team, led by Aleksandr Aravkin and Peng Zheng" />
+  <meta name="github-repo" content="rsoren/health_metrics_toolbox" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Health Metrics Toolbox" />
+  
+  <meta name="twitter:description" content="A guide to statistical tools developed by IHME’s Math Sciences team, led by Aleksandr Aravkin and Peng Zheng" />
+  
+
+<meta name="author" content="Maintained by Reed Sorensen (rsoren@uw.edu)" />
+
+
+<meta name="date" content="2021-07-07" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+<link rel="next" href="quickstart.html"/>
+<script src="libs/header-attrs-2.8/header-attrs.js"></script>
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.0.1/anchor-sections.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.0.1/anchor-sections.js"></script>
+
+
+
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Health Metrics Toolbox</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="quickstart.html"><a href="quickstart.html"><i class="fa fa-check"></i><b>2</b> Quick start</a></li>
+<li class="chapter" data-level="3" data-path="mrbrt.html"><a href="mrbrt.html"><i class="fa fa-check"></i><b>3</b> MR-BRT</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="mrbrt.html"><a href="mrbrt.html#prep_data"><i class="fa fa-check"></i><b>3.1</b> Prepare simulated data</a></li>
+<li class="chapter" data-level="3.2" data-path="mrbrt.html"><a href="mrbrt.html#section1"><i class="fa fa-check"></i><b>3.2</b> Fitting a standard mixed effects model</a>
+<ul>
+<li class="chapter" data-level="3.2.1" data-path="mrbrt.html"><a href="mrbrt.html#section1_1"><i class="fa fa-check"></i><b>3.2.1</b> – Point prediction only</a></li>
+<li class="chapter" data-level="3.2.2" data-path="mrbrt.html"><a href="mrbrt.html#section1_2"><i class="fa fa-check"></i><b>3.2.2</b> – Uncertainty from fixed effects only</a></li>
+<li class="chapter" data-level="3.2.3" data-path="mrbrt.html"><a href="mrbrt.html#section1_3"><i class="fa fa-check"></i><b>3.2.3</b> – Uncertainty from fixed effects and between-study heterogeneity</a></li>
+<li class="chapter" data-level="3.2.4" data-path="mrbrt.html"><a href="mrbrt.html#section1_4"><i class="fa fa-check"></i><b>3.2.4</b> – Predicting out on the random effects</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="mrbrt.html"><a href="mrbrt.html#section2"><i class="fa fa-check"></i><b>3.3</b> Priors</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="mrbrt.html"><a href="mrbrt.html#section2_2"><i class="fa fa-check"></i><b>3.3.1</b> - Setting a prior on beta</a></li>
+</ul></li>
+<li class="chapter" data-level="3.4" data-path="mrbrt.html"><a href="mrbrt.html#section3"><i class="fa fa-check"></i><b>3.4</b> Removing the effects of outliers with trimming</a></li>
+<li class="chapter" data-level="3.5" data-path="mrbrt.html"><a href="mrbrt.html#section4"><i class="fa fa-check"></i><b>3.5</b> Splines</a>
+<ul>
+<li class="chapter" data-level="3.5.1" data-path="mrbrt.html"><a href="mrbrt.html#section4_1"><i class="fa fa-check"></i><b>3.5.1</b> - Setting priors and shape constraints on splines</a></li>
+<li class="chapter" data-level="3.5.2" data-path="mrbrt.html"><a href="mrbrt.html#section4_2"><i class="fa fa-check"></i><b>3.5.2</b> - Ensemble splines</a></li>
+</ul></li>
+<li class="chapter" data-level="3.6" data-path="mrbrt.html"><a href="mrbrt.html#section5"><i class="fa fa-check"></i><b>3.6</b> The ratio model</a></li>
+<li class="chapter" data-level="3.7" data-path="mrbrt.html"><a href="mrbrt.html#section6"><i class="fa fa-check"></i><b>3.7</b> Automated covariate selection</a></li>
+<li class="chapter" data-level="3.8" data-path="mrbrt.html"><a href="mrbrt.html#section7"><i class="fa fa-check"></i><b>3.8</b> Calculating an evidence score</a></li>
+<li class="chapter" data-level="3.9" data-path="mrbrt.html"><a href="mrbrt.html#section9"><i class="fa fa-check"></i><b>3.9</b> Frequently asked questions</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="xwalk.html"><a href="xwalk.html"><i class="fa fa-check"></i><b>4</b> Crosswalk</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="xwalk.html"><a href="xwalk.html#ex1"><i class="fa fa-check"></i><b>4.1</b> Example 1: one reference and one alternative</a></li>
+<li class="chapter" data-level="4.2" data-path="xwalk.html"><a href="xwalk.html#ex2"><i class="fa fa-check"></i><b>4.2</b> Example 2: one reference and multiple alternatives, with indirect comparisons</a></li>
+<li class="chapter" data-level="4.3" data-path="xwalk.html"><a href="xwalk.html#ex3"><i class="fa fa-check"></i><b>4.3</b> Example 3: one reference and multiple alternatives; alternatives composed of sub-definitions</a></li>
+<li class="chapter" data-level="4.4" data-path="xwalk.html"><a href="xwalk.html#ex4"><i class="fa fa-check"></i><b>4.4</b> Funnel plots and dose-response plots</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Published with bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Health Metrics Toolbox</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="header">
+<h1 class="title">Health Metrics Toolbox</h1>
+<h2 class="subtitle"><em>A guide to statistical packages developed by the IHME Math Sciences team</em></h2>
+<p class="author"><em>Maintained by Reed Sorensen (<a href="mailto:rsoren@uw.edu" class="email">rsoren@uw.edu</a>)</em></p>
+<p class="date" style="margin-top: 1.5em;"><em>2021-07-07</em></p>
+</div>
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">Chapter 1</span> Introduction</h1>
+<p>This book describes how to use statistical packages developed by the Mathematical Sciences team at IHME. These packages are the result of pioneering work by Dr. Aleksandr Aravkin (director) and Dr. Peng Zheng, with auxiliary input from several others. While the goal here is to provide internal documentation for IHME staff, the packages are open source and can be run by anyone. We provide installation instructions for both audiences in Chapter 2.</p>
+<p>The packages were originally developed in Python. Because the R programming language is more often used by public health practitioners, we created R packages that mirror the underlying Python. The code examples in the following chapters employ both R and Python.</p>
+
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+<a href="quickstart.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/rstudio/bookdown-demo/edit/master/index.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["bookdown-demo.pdf", "bookdown-demo.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
