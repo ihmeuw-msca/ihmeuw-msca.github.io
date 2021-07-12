@@ -10,7 +10,7 @@ bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
 github-repo: rsoren/health_metrics_toolbox
-description: "A guide to statistical tools developed by IHME's Math Sciences team, led by Aleksandr Aravkin and Peng Zheng"
+description: "A guide to statistical tools developed by IHME's Math Sciences team"
 ---
 
 # Introduction

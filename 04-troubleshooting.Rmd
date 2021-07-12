@@ -23,13 +23,11 @@ knitr::opts_chunk$set(
 
 Please provide:
 
-- A link to a CSV with the data
+- A link to a CSV with the data,
 
-- The minimal amount of code needed to reproduce the problem
+- The minimal amount of code needed to reproduce the problem, after refreshing the session with `Session --> Restart R` and clearing objects from the environment with `rm(list = ls())`,
 
-- The output of `sessionInfo()`
-
-- Information about how the R environment was created (e.g. the command used to start the Singularity session)
+- The output of `sessionInfo()`.
 
 
 

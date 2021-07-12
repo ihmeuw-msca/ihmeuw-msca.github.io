@@ -360,7 +360,7 @@ mod5 <- MRBRT(
       # spline_knots = array(c(0, 0.25, 0.5, 0.75, 1)),
       spline_knots = array(seq(0, 1, by = 0.2)),
       spline_degree = 2L,
-      spline_knots_type = 'frequency',
+      spline_knots_type = 'domain',
       spline_r_linear = TRUE,
       spline_l_linear = FALSE
       # prior_spline_monotonicity = 'increasing'
