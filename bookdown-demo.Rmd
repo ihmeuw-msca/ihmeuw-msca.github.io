@@ -1,0 +1,1245 @@
+--- 
+title: "Health Metrics Toolbox"
+subtitle: "A guide to statistical packages developed by the IHME Math Sciences team"
+author: "Maintained by Reed Sorensen (rsoren@uw.edu)"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+output: bookdown::gitbook
+documentclass: book
+bibliography: [book.bib, packages.bib]
+biblio-style: apalike
+link-citations: yes
+github-repo: rsoren/health_metrics_toolbox
+description: "A guide to statistical tools developed by IHME's Math Sciences team"
+---
+
+# Introduction
+
+This book describes how to use statistical packages developed by the Mathematical Sciences team at IHME. These packages are the result of pioneering work by Dr. Aleksandr Aravkin (director) and Dr. Peng Zheng, with auxiliary input from several others. While the goal here is to provide internal documentation for IHME staff, the packages are open source and can be run by anyone. We provide installation instructions for both audiences in Chapter 2. 
+
+The packages were originally developed in Python. Because the R programming language is more often used by public health practitioners, we created R packages that mirror the underlying Python. The code examples in the following chapters employ both R and Python. 
+
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```
+
+
+
+
+<!--chapter:end:index.Rmd-->
+
+# Quick start {#quickstart}
+
+To run MR-BRT locally in a Docker container, follow the installation instructions here: https://github.com/ihmeuw-msca/mrtoolr.
+
+R packages are also installed on the IHME cluster. IHME users please see https://hub.ihme.washington.edu/display/MSCA/Math+Sciences+Team for how to load R packages on the cluster. 
+
+<!--chapter:end:01-installation.Rmd-->
+
+# MR-BRT {#mrbrt}
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Prepare simulated data {#prep_data}
+
+```{r echo = FALSE}
+source("filepaths.R")
+```
+
+```{r message=FALSE}
+library(dplyr)
+library(mrbrt002, lib.loc = path_to_r_version4_packages)
+
+set.seed(1)
+k_studies <- 10
+n_per_study <- 5
+# k_studies <- 40
+# n_per_study <- 40
+tau_1 <- 4
+sigma_1 <- 1
+tau_2 <- 0.6
+sigma_2 <- 0.2
+
+df_sim_study <- data.frame(study_id = as.factor(1:k_studies)) %>%
+  mutate(
+    study_effect1 = rnorm(n = k_studies, mean = 0, sd = tau_1),
+    study_effect2 = rnorm(n = k_studies, mean = 0, sd = tau_2)
+    # study_colors = brewer.pal(n = k_studies, "Spectral")
+  )
+
+df_sim1 <- do.call("rbind", lapply(1:nrow(df_sim_study), function(i) {
+  df_sim_study[rep(i, n_per_study), ] })) %>%
+  mutate(
+    x1 = runif(n = nrow(.), min = 0, max = 10),
+    y1 = 0.9*x1 + study_effect1 + rnorm(nrow(.), mean = 0, sd = sigma_1),
+    y1_se = sigma_1,
+    y2_true = 2 * sin(0.43*x1-2.9),
+    y2 = y2_true - min(y2_true) + study_effect2 + rnorm(nrow(.), mean = 0, sd = sigma_2),
+    y2_se = sigma_2,
+    is_outlier = FALSE) %>%
+  arrange(x1)
+
+df_sim2 <- df_sim1 %>%
+  rbind(., .[(nrow(.)-7):(nrow(.)-4), ] %>% mutate(y1=y1-18, y2=y2-4, is_outlier = TRUE))
+
+# function for plotting uncertainty intervals
+add_ui <- function(dat, x_var, lo_var, hi_var, color = "darkblue", opacity = 0.2) {
+  polygon(
+    x = c(dat[, x_var], rev(dat[, x_var])),
+    y = c(dat[, lo_var], rev(dat[, hi_var])),
+    col = adjustcolor(col = color, alpha.f = opacity), border = FALSE
+  )
+}
+
+```
+
+<br><br>
+
+## Fitting a standard mixed effects model {#section1}
+
+```{r}
+dat1 <- MRData()
+dat1$load_df(
+  data = df_sim1,  col_obs = "y1", col_obs_se = "y1_se",
+  col_covs = list("x1"), col_study_id = "study_id" )
+
+mod1 <- MRBRT(
+  data = dat1,
+  cov_models = list(
+    LinearCovModel("intercept", use_re = TRUE),
+    LinearCovModel("x1") ) )
+
+mod1$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+
+df_pred1 <- data.frame(x1 = seq(0, 10, by = 0.1))
+
+dat_pred1 <- MRData()
+
+dat_pred1$load_df(
+  data = df_pred1, 
+  col_covs=list('x1')
+)
+
+```
+
+
+To save a model object, use the `py_save_object()` function. To load a saved model object, use `py_load_object`.
+```{r}
+# py_save_object(object = mod1, filename = file.path(path_to_misc_outputs, "mod1.pkl"), pickle = "dill")
+# mod1 <- py_load_object(filename = file.path(path_to_misc_outputs, "mod1.pkl"), pickle = "dill")
+
+```
+
+<br>
+
+### -- Point prediction only {#section1_1}
+
+If you don't need uncertainty estimates, this option is the fastest.
+
+```{r}
+df_pred1$pred0 <- mod1$predict(data = dat_pred1)
+with(df_sim1, plot(x1, y1))
+with(df_pred1, lines(x1, pred0))
+```
+### -- Uncertainty from fixed effects only (using asymptotic statistics) {#section1_2}
+
+If we can assume that the posterior distributions of the parameters are Gaussian (i.e. no hard constraints specified in the model), we can obtain samples from the fixed effects using a fast algorithm. 
+
+```{r}
+
+n_samples1 <- 1000L
+
+samples1 <- core$other_sampling$sample_simple_lme_beta(
+  sample_size = n_samples1, 
+  model = mod1
+)
+
+draws1 <- mod1$create_draws(
+  data = dat_pred1,
+  beta_samples = samples1,
+  gamma_samples = matrix(rep(0, n_samples1), ncol = 1),
+  random_study = FALSE )
+
+df_pred1$pred1 <- mod1$predict(data = dat_pred1)
+df_pred1$pred1_lo <- apply(draws1, 1, function(x) quantile(x, 0.025))
+df_pred1$pred1_hi <- apply(draws1, 1, function(x) quantile(x, 0.975))
+with(df_sim1, plot(x1, y1))
+with(df_pred1, lines(x1, pred1))
+add_ui(df_pred1, "x1", "pred1_lo", "pred1_hi")
+```
+
+
+<br>
+
+### -- Uncertainty from fixed effects only (using fit-refit) {#section1_2}
+
+We use the fit-refit method for obtaining samples from the parameters when there are uniform priors (a.k.a. constraints) specified in the model, which can make the posterior distributions of parameters not Gaussian. This code using `mod1$sample_soln` gives the same result as above.
+
+```{r eval = FALSE}
+
+n_samples2 <- 1000L 
+
+samples2_fitrefit <- mod1$sample_soln(sample_size = n_samples2)
+
+draws2_fitrefit <- mod1$create_draws(
+  data = dat_pred1,
+  beta_samples = samples2_fitrefit[[1]],
+  gamma_samples = samples2_fitrefit[[2]],
+  random_study = FALSE )
+
+df_pred1$pred2 <- mod1$predict(data = dat_pred1)
+df_pred1$pred2_lo <- apply(draws2_fitrefit, 1, function(x) quantile(x, 0.025))
+df_pred1$pred2_hi <- apply(draws2_fitrefit, 1, function(x) quantile(x, 0.975))
+with(df_sim1, plot(x1, y1))
+with(df_pred1, lines(x1, pred2))
+add_ui(df_pred1, "x1", "pred2_lo", "pred2_hi")
+```
+
+<br>
+
+### -- Uncertainty from fixed effects and between-study heterogeneity {#section1_3}
+
+When we require samples of gamma (uncertainty in the parameter that estimates between-study heterogeneity), we need to use the `sample_soln` approach. 
+
+```{r}
+
+n_samples3 <- 1000L
+samples3 <- mod1$sample_soln(sample_size = n_samples3)
+
+draws3 <- mod1$create_draws(
+  data = dat_pred1,
+  beta_samples = samples3[[1]],
+  gamma_samples = samples3[[2]], 
+  random_study = TRUE )
+
+# if a single value of gamma is sufficient (not sampling from the uncertainty of gamma), 
+# you can pass in the point estimate for gamma like this:
+#
+# draws3 <- mod1$create_draws(
+#   data = dat_pred1,
+#   beta_samples = samples3[[1]],
+#   gamma_samples = matrix(rep(mod1$gamma_soln, n_samples3), ncol = 1),
+#   random_study = TRUE )
+
+df_pred1$pred3 <- mod1$predict(dat_pred1)
+df_pred1$pred3_lo <- apply(draws3, 1, function(x) quantile(x, 0.025))
+df_pred1$pred3_hi <- apply(draws3, 1, function(x) quantile(x, 0.975))
+with(df_sim1, plot(x1, y1))
+with(df_pred1, lines(x1, pred3))
+add_ui(df_pred1, "x1", "pred3_lo", "pred3_hi")
+```
+
+
+<br>
+
+### -- Predicting out on the random effects {#section1_4}
+
+To incorporate the estimated random effects into point predictions, specify `col_study_id` in the data object you pass to the `predict()` function, and set `predict_for_study = TRUE` and `sort_by_data_id = TRUE` in the `predict()` function. 
+
+Important! If `sort_by_data_id = TRUE` is not specified, the predictions might not line up with the rows of the prediction data frame. 
+
+```{r}
+# 1. convert prediction frame into a MRData() object
+# 2. extract the (potentially) sorted data frame with the to_df() function
+# 3. add the predictions to this new data frame
+
+dat_sim1_tmp <- MRData()
+dat_sim1_tmp$load_df(data = df_sim1, col_covs = list("x1"), col_study_id = "study_id")
+
+df_sim1$pred_re <- mod1$predict(
+  data = dat_sim1_tmp, 
+  predict_for_study = TRUE, 
+  sort_by_data_id = TRUE
+)
+
+with(df_sim1, plot(x1, y1))
+for (id in unique(df_sim1$study_id)) {
+  with(filter(df_sim1, study_id == id), lines(x1, y1, lty = 2))
+}
+
+with(df_sim1, plot(x1, y1))
+for (id in unique(df_sim1$study_id)) {
+  # id <- 4 # dev
+  df_tmp <- filter(arrange(df_sim1, x1), study_id == id)
+  with(df_tmp, lines(x1, pred_re, lty = 1))
+}
+
+# to get the random effects by group...
+re <- mod1$re_soln
+df_re <- data.frame(level = names(mod1$re_soln), re = unlist(mod1$re_soln))
+
+# with(df_sim1, plot(x1, y1))
+```
+
+<br><br>
+
+## Priors {#section2}
+
+
+#### - Setting a prior on gamma {#section2_1}
+```{r}
+mod3 <- MRBRT(
+  data = dat1,
+  cov_models = list(
+    LinearCovModel("intercept", use_re = TRUE, prior_gamma_gaussian = array(c(0, 0.02))),
+    LinearCovModel("x1") ) )
+
+mod3$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+
+dat_sim1_tmp <- MRData()
+dat_sim1_tmp$load_df(data = df_sim1, col_covs = list("x1"), col_study_id = "study_id")
+df_sim1$pred_re_prior <- mod3$predict(data = dat_sim1_tmp, predict_for_study = TRUE, sort_by_data_id = TRUE)
+
+with(df_sim1, plot(x1, y1))
+for (id in unique(df_sim1$study_id)) {
+  df_tmp <- filter(arrange(df_sim1, x1), study_id == id)
+  with(df_tmp, lines(x1, pred_re_prior, lty = 1))
+}
+
+```
+
+<br>
+
+### - Setting a prior on beta {#section2_2}
+
+With great power comes great responsibility...
+
+```{r}
+mod4 <- MRBRT(
+  data = dat1,
+  cov_models = list(
+    LinearCovModel("intercept", use_re = TRUE),
+    LinearCovModel("x1", prior_beta_uniform = array(c(-3.1, -2.9))) ) )
+
+mod4$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+df_pred1$pred4 <- mod4$predict(data = dat_pred1)
+with(df_sim1, plot(x1, y1))
+with(df_pred1, lines(x1, pred4))
+
+```
+
+
+
+## Removing the effects of outliers with trimming {#section3}
+
+```{r}
+dat2 <- MRData()
+dat2$load_df(
+  data = df_sim2,  col_obs = "y1", col_obs_se = "y1_se",
+  col_covs = list("x1"), col_study_id = "study_id" )
+
+df_pred2 <- data.frame(x1 = seq(0, 10, by = 2))
+dat_pred2 <- MRData()
+
+dat_pred2$load_df(
+  data = df_pred2,
+  col_covs=list('x1')
+)
+
+```
+
+
+```{r}
+mod2 <- MRBRT(
+  data = dat2,
+  cov_models = list(
+    LinearCovModel("intercept", use_re = TRUE),
+    LinearCovModel("x1") ),
+  inlier_pct = 0.9)
+
+mod2$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+df_pred2$pred4 <- mod2$predict(data = dat_pred2)
+
+# get a data frame with estimated weights
+df_mod2 <- cbind(mod2$data$to_df(), data.frame(w = mod2$w_soln))
+
+with(df_mod2, plot(
+  x = x1, y = obs,  
+  col = ifelse(w == 1, "black", "red"),  
+  pch = ifelse(w == 1, 1, 16)
+))
+with(df_pred2, lines(x1, pred4))
+
+```
+
+
+## Splines {#section4}
+
+### - Setting priors and shape constraints on splines {#section4_1}
+
+- `spline_l_linear` and `spline_r_linear` make the left and right tail segments linear, respectively
+
+- `prior_spline_monotonicity` forces the spline to be "increasing" or "decreasing"
+
+- `prior_spline_convexity` makes the spline "convex" or "concave"
+
+- `prior_spline_maxder_gaussian = array(c(0, 0.03))` has the effect of putting a dampening prior on the spline, making the highest-order derivative of each segment subject to a $N(0, 0.03^2)$ Gaussian prior. This makes a cubic spline more quadratic, quadratic more linear, etc. 
+
+- When `spline_l_linear` and `spline_r_linear` are set to `TRUE`, the value given to `prior_spline_maxder_gaussian` for those segments is a direct prior on the slope of the segment. For example, `prior_spline_maxder_gaussian = rbind(c(0,0,0,0,-1), c(Inf,Inf,Inf,Inf,0.0001))` makes the slope of the right tail very close to `-1` when `spline_r_linear = TRUE`. Note that the function takes a matrix as an input, where the first row is a vector a prior means and the second row is a vector of prior standard deviations. The number of columns must match the number of knots minus 1. 
+
+
+```{r}
+dat3 <- MRData()
+dat3$load_df(
+  data = df_sim1, col_obs = "y2", col_obs_se = "y2_se",
+  col_covs = list("x1"), col_study_id = "study_id" )
+
+mod5 <- MRBRT(
+  data = dat3,
+  cov_models = list(
+    LinearCovModel("intercept", use_re = TRUE),
+    LinearCovModel(
+      alt_cov = "x1",
+      use_spline = TRUE,
+      # spline_knots = array(c(0, 0.25, 0.5, 0.75, 1)),
+      spline_knots = array(seq(0, 1, by = 0.2)),
+      spline_degree = 2L,
+      spline_knots_type = 'domain',
+      spline_r_linear = TRUE,
+      spline_l_linear = FALSE
+      # prior_spline_monotonicity = 'increasing'
+      # prior_spline_convexity = "convex"
+      # prior_spline_maxder_gaussian = array(c(0, 0.01))
+      # prior_spline_maxder_gaussian = rbind(c(0,0,0,0,-1), c(Inf,Inf,Inf,Inf,0.0001))
+    )
+  )
+)
+
+mod5$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+
+df_pred3 <- data.frame(x1 = seq(0, 10, by = 0.1))
+dat_pred3 <- MRData()
+dat_pred3$load_df(
+  data = df_pred3, 
+  col_covs=list('x1')
+)
+
+df_pred3$pred5 <- mod5$predict(data = dat_pred3)
+with(df_sim1, plot(x1, y2))
+with(df_pred3, lines(x1, pred5))
+
+# # visualize knot locations
+for (k in mod5$cov_models[[2]]$spline_knots) abline(v = k, col = "gray")
+
+
+```
+
+### - Ensemble splines {#section4_2}
+
+See this link about arguments for the `sample_knots()` function (or do `py_help(utils$sample_knots)` in an interactive session): https://github.com/ihmeuw-msca/mrtool/blob/740f605264732f0faa604614a987fc38c7d88f83/src/mrtool/core/utils.py#L293. 
+
+```{r}
+
+dat4 <- MRData()
+dat4$load_df(
+  data = df_sim1, col_obs = "y2", col_obs_se = "y2_se",
+  col_covs = list("x1"), col_study_id = "study_id" )
+
+knots_samples <- utils$sample_knots(
+  num_intervals = 3L, 
+  knot_bounds = rbind(c(0.0, 0.4), c(0.6, 1.0)),
+  num_samples = 20L
+)
+
+ensemble_cov_model1 <- LinearCovModel(
+  alt_cov = "x1",
+  use_spline = TRUE,
+  spline_knots = array(c(0, 0.33, 0.66, 1)),
+  spline_degree = 3L,
+  spline_knots_type = 'frequency'
+)
+
+mod5a <- MRBeRT(
+  data = dat3,
+  ensemble_cov_model = ensemble_cov_model1,
+  ensemble_knots = knots_samples,
+  cov_models = list(
+    LinearCovModel("intercept", use_re = TRUE)
+  )
+)
+
+mod5a$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+
+df_pred3 <- data.frame(x1 = seq(0, 10, by = 0.1))
+dat_pred3 <- MRData()
+dat_pred3$load_df(
+  data = df_pred3, 
+  col_covs=list('x1')
+)
+
+# this predicts a weighted average from the spline ensemble
+df_pred3$pred5a <- mod5a$predict(data = dat_pred3)
+
+
+with(df_sim1, plot(x1, y2))
+with(df_pred3, lines(x1, pred5a))
+
+# # view all splines in the ensemble
+#
+# pred5a <- mod5a$predict(data = dat_pred3, return_avg = FALSE)
+# 
+# with(df_sim1, plot(x1, y2))
+# for (i in 1:nrow(pred5a)) {
+#   tmp <- pred5a[i, ]
+#   with(df_pred3, lines(x1, tmp))
+# }
+
+
+
+```
+
+
+<br><br>
+
+## The ratio model {#section5}
+
+This model is useful when a covariate is represented as a range. For example, often population-level data are indexed by age group. We can represent this in the model as `alt_cov = c("age_start", "age_end")`. Or if a relative risk estimate corresponds to a comparison of two BMI ranges, we specify the model as `alt_cov = c("b_0", "b_1")` and `ref_cov = c("a_0", "a_1")`. When predicting out, we need to set a constant reference level and varying alternative level. 
+
+For `LogCovModel`, our regression model can be represented as
+
+$y = ln(1 + X_{alt}\beta) - ln(1 + X_{ref}\beta)$,
+
+where $X_{alt}$ and $X_{ref}$ are the design matrix for the alternative and reference groups. They could be either covariates or the spline design matrices from the covariates.
+
+When we want to include the random effects, we always assume a random "slope",
+
+$y = (\frac{ln(1 + X_{alt}\beta) - ln(1 + X_{ref}\beta)}{X_{alt}-X_{ref}} + u)(X_{alt}-X_{ref})$
+
+Ratio models do not need an intercept specified, as we are considering relative risk where measurement is invariant with the scaling of the curve.
+
+In the ratio model, if we set `use_re=TRUE`, we automatically turn on the `use_re_mid_point`, since for log relative risk, we always consider the random effects as the random average slope.
+
+We use spline to parameterize the relative risk curve in the linear space, and all the shape constraints are in linear space.
+
+
+
+
+```{r eval = FALSE}
+
+# creating simulated data with exposure ranges
+set.seed(1)
+
+df_sim3 <- do.call("rbind", lapply(1:nrow(df_sim1), function(i) {
+  # i <- 1 # dev
+  x_offset <- 0.1
+  
+  row_j <- sample(1:nrow(df_sim1), 1)
+  df_i <- df_sim1[i, ]
+  df_j <- df_sim1[row_j, ]
+  
+  df_k <- data.frame(
+    row_i = i,
+    row_j = row_j,
+    a_0 = df_i$x1 - x_offset, a_1 = df_i$x1 + x_offset,
+    b_0 = df_j$x1 - x_offset, b_1 = df_j$x1 + x_offset,
+    log_rr = df_j$y2 - df_i$y2,
+    log_rr_se = 1
+  )
+  
+  return(df_k)
+}))
+
+head(df_sim3)
+
+dat1 <- MRData()
+dat1$load_df(
+  data = df_sim3,  col_obs = "log_rr", col_obs_se = "log_rr_se",
+  col_covs = list("a_0", "a_1", "b_0", "b_1") )
+
+mod6 <- MRBRT(
+  data = dat1,
+  cov_models = list(
+    LogCovModel(
+      alt_cov = c("b_0", "b_1"),
+      ref_cov = c("a_0", "a_1"),
+      use_re = TRUE,
+      use_spline = TRUE,
+      # spline_knots = array(seq(0, 1, by = 0.2)),
+      spline_knots = array(c(0, 0.25, 0.5, 0.75, 1)),
+      spline_degree = 3L,
+      spline_knots_type = 'frequency',
+      name = "exposure"
+    )
+  )
+)
+
+mod6$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
+
+# df_pred6 <- data.frame(exposure = seq(0, 10, by = 2), study_id = "4")
+df_pred6 <- data.frame(
+  b_0 = seq(0, 10, by = 0.1),
+  b_1 = seq(0, 10, by = 0.1) ) %>%
+  mutate(a_0 = 0, a_1 = 0 )
+
+dat_pred6 <- MRData()
+
+dat_pred6$load_df(
+  data = df_pred6, 
+  col_covs=list('a_0', 'a_1', 'b_0', 'b_1')
+  # col_covs=list("exposure")
+)
+
+pred6 <- mod6$predict(dat_pred6)
+
+with(df_sim3, plot(b_0, log_rr))
+with(df_pred6, lines(b_0, pred6))
+
+
+```
+
+<br><br>
+
+## Automated covariate selection {#section6}
+
+```{r eval = TRUE}
+# create simulated data
+set.seed(123)
+
+beta <- c(0, 0, 0, 1.2, 0, 1.5, 0)
+gamma <- rep(0, 7)
+num_obs <- 100
+obs_se = 0.1
+studies <- c("A", "B", "C")
+
+covs <- cbind(
+  rep(1, num_obs),
+  do.call("cbind", lapply(1:(length(beta)-1), function(i) rnorm(num_obs)))
+)
+
+obs <- covs %*% beta + rnorm(n = num_obs, mean = 0, sd = obs_se)
+df_sim4 <- as.data.frame(do.call("cbind", list(obs, rep(obs_se, num_obs), covs))) %>%
+  select(-V3)
+cov_names <- paste0("cov", 1:(length(beta)-1))
+names(df_sim4) <- c("obs", "obs_se", cov_names)
+df_sim4$study_id <- sample(studies, num_obs, replace = TRUE)
+
+mrdata <- MRData()
+
+mrdata$load_df(
+  data = df_sim4, 
+  col_obs = 'obs', 
+  col_obs_se = 'obs_se', 
+  col_study_id = 'study_id', 
+  col_covs = as.list(cov_names)
+)
+
+candidate_covs <- cov_names[!cov_names == "cov1"]
+
+covfinder <- CovFinder(
+  data = mrdata, 
+  covs = as.list(candidate_covs),
+  pre_selected_covs = list("cov1"), 
+  normalized_covs = FALSE,
+  num_samples = 1000L, 
+  power_range = list(-4, 4), 
+  power_step_size = 1, 
+  laplace_threshold = 1e-5
+)
+
+covfinder$select_covs(verbose = TRUE)
+
+covfinder$selected_covs
+
+
+
+
+```
+
+
+<br><br>
+
+## Calculating an evidence score {#section7}
+
+For documentation on the `Scorelator` function, see `py_help(evidence_score$Scorelator)` or go to https://github.com/ihmeuw-msca/MRTool/blob/5078ded1f22a99fd733ffd15de258cc407a8f4fd/src/mrtool/evidence_score/scorelator.py. 
+
+The code below creates a dataset for simulating the effect of a dichotomous risk factor, fits a MR-BRT model on it, and calculates an evidence score. Note that continuous risk factors will want to specify `score_type = "area"` in the `evidence_score$Scorelator()` function.
+
+```{r eval=FALSE}
+
+# get simulated data, run model and get draws 
+# for passing to the Scorelator function
+
+df_sim7_in <- read.csv("example_data/linear_sim_evidence_score_0_0.5.csv")
+
+cutoff = round(quantile(df_sim7_in$b_1, probs = 0.3), 2)
+
+df_sim7 <- df_sim7_in %>%
+  mutate(
+    a_mid = (a_0 + a_1) / 2,
+    b_mid = (b_0 + b_1) / 2,
+    ref = ifelse(a_mid <= cutoff, 0, 1),
+    alt = ifelse(b_mid <= cutoff, 0, 1) ) %>%
+  filter(ref == 0 & alt == 1)
+
+
+dat_sim7 <- MRData()
+
+dat_sim7$load_df(
+  data = df_sim7, 
+  col_obs = "rr_log", 
+  col_obs_se = "rr_log_se", 
+  col_covs = list("ref", "alt"), 
+  col_study_id = "study_id"
+)
+
+cov_models7 <- list(
+  LinearCovModel(
+    alt_cov = "intercept", 
+    use_re = TRUE, 
+    prior_beta_uniform = array(c(0.0, Inf))
+  )
+)
+
+mod7 <- MRBRT(
+  data = dat_sim7,
+  cov_models = cov_models7
+)
+mod7$fit_model(inner_max_iter = 1000L, inner_print_level = 5L)
+
+
+
+df_pred7 <- data.frame(intercept = 1, ref = 0, alt = 1)
+dat_pred7 <- MRData()
+dat_pred7$load_df(data = df_pred7, col_covs = list("ref", "alt"))
+
+samples7 <- mod7$sample_soln(sample_size = 1000L)
+beta_samples7 <- samples7[[1]]
+gamma_samples7 <- samples7[[2]]
+
+y_draws7 <- mod7$create_draws(
+  data = dat_pred7, 
+  beta_samples = beta_samples7,
+  gamma_samples = gamma_samples7,
+  random_study = TRUE
+)
+
+
+```
+
+```{r eval=FALSE}
+# using the scorelator
+
+# need to run 'repl_python()' to open an interactive Python interpreter,
+# then immediately type 'exit' to get back to the R interpreter
+# -- this helps to load a required Python package
+repl_python()
+# -- type 'exit' or hit escape
+
+evidence_score <- import("mrtool.evidence_score.scorelator")
+scorelator7 <- evidence_score$Scorelator(
+  ln_rr_draws = t(y_draws7),
+  exposures = array(1), 
+  score_type = "point"
+)
+
+score <- scorelator7$get_evidence_score(path_to_diagnostic=file.path(path_to_misc_outputs, "tmp_score.pdf"))
+
+
+```
+
+
+
+<br><br>
+
+## Frequently asked questions {#section9}
+
+- How do I access the help documentation?
+
+In an interactive R session, type `py_help(...)` where `...` is the name of the function. This will show the Python docstring with information about required/optional arguments and a description of what they mean. 
+
+- Where should I go with questions? 
+
+The #friends_of_mr_brt Slack channel is a good place to start for troubleshooting questions. It's maintained by the Mathematical Sciences and Computational Algorithms (MSCA) team. If something requires a more in-depth discussion, feel free to sign up for a slot at office hours (#mscm-office-hours Slack channel). 
+
+- What does MR-BRT stand for?
+
+Meta-regression with Bayesian priors, Regularization and Trimming
+
+
+
+
+
+<!--chapter:end:02-mrbrt.Rmd-->
+
+# Crosswalk {#xwalk}
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+[Example 1, basic crosswalk](#ex1)
+
+[Example 2, network meta-analysis](#ex2)
+
+[Example 3, network meta-analysis with composite groups](#ex3)
+
+[Funnel plots and dose-response plots](#ex4)
+
+---
+
+Crosswalking is the process of taking systematically biased data points and estimating their unbiased value. For example, when estimating overweight prevalence (BMI >= 25), some height and weight observations might be measured physically while others are self-reported. Because people tend to overreport their height and underreport their weight, self-reported BMI is systematically biased downward. Crosswalking involves: 
+
+1. Finding pairs of alternative and reference (e.g. self-reported and measured) observations that match on relevant criteria (e.g. age, sex and location),
+2. Taking the difference between these observations in log or logit space, to ensure that the crosswalk adjustment remains bounded correctly,
+3. Running a meta-regression model that estimates how this difference varies by covariate values (e.g. age, sex and location); and 
+4. Predicting how much the alternative data points in the original dataset should be adjusted. 
+
+To appropriately downweight the adjusted data point, we add uncertainty that comes from crosswalking process itself -- standard error of the prediction and between-group heterogeneity -- to the standard error of the result. 
+
+Sometimes a crosswalk needs to adjust multiple alternative definitions to the gold standard reference. For example, prevalence of schistosomiasis might be measured according to a gold standard diagnostic method A, or three alternatives B, C or D. The process is essentially the same as described above, with the added benefit that _network meta-analysis_ can use information from the indirect comparisons B:C, C:D and B:D. This vignette demonstrates how to use the `crosswalk` package to run a meta-regression (optionally network meta-regression) to predict adjustment factors for biased observations. 
+
+## Example 1: one reference and one alternative {#ex1}
+
+First, we create some simulated data for a crosswalk with one reference and one alternative. In `df_matched`, the variable `logit_diff` represents `logit(prev_alt) - logit(prev_ref)`, or the difference in logit-transformed prevalence values. By convention, we always subtract the reference from the alternative value, alt minus ref. `logit_diff_se` is the standard error of `logit_diff`. The package includes the functions `crosswalk::delta_transform()` and `crosswalk::calculate_diff()` to facilitate calculating these quantities from your matched data. See https://rpubs.com/rsoren/572599 for a full example. 
+
+We also simulate the original dataset containing observations to be adjusted (`df_orig`). The covariates used in the meta-regression model must exist in the original data, with the same column names (`x1` and `x2` in this case). We also include a column that indicates the definition/method used to obtain the observation: `obs_method` with values "selfreported" and "measured" in this case. For `df_orig`, we leave the dependent variable in linear space; the conversion to log or logit space is handled automatically by the `adjust_orig_vals()` function later. 
+
+```{r echo = FALSE}
+source("filepaths.R")
+```
+
+```{r message = FALSE}
+library(crosswalk002, lib.loc = path_to_r_version4_packages)
+library(dplyr)
+set.seed(123)
+# data for the meta-regression
+# -- in a real analysis, you'd get this dataset by 
+#    creating matched pairs of alternative/reference observations,
+#    then using delta_transform() and calculate_diff() to get
+#    log(alt)-log(ref) or logit(alt)-logit(ref) as your dependent variable
+beta0_true <- -3
+beta1_true <- 1
+beta2_true <- 2
+df_matched <- data.frame(
+  x1 = runif(n = 200, min = 0, max = 4),
+  x2 = rbinom(n = 200, prob = 0.5, size = 1) ) %>%
+  mutate(
+    logit_diff = beta0_true + x1*beta1_true + x2*beta2_true + rnorm(n = nrow(.)),
+    logit_diff_se = runif(200, min = 0.9, max = 1.1),
+    altvar = "selfreported",
+    refvar = "measured",
+    group_id = rep(1:20, each = 10)
+  )
+head(df_matched)
+# original dataset with alternative observations to be adjusted
+df_orig <- data.frame(stringsAsFactors = FALSE,
+  meanvar = runif(400, min = 0.2, max = 0.8), # original prevalence values; between 0 and 1
+  sdvar = runif(400, min = 0.1, max = 0.5), # standard errors of the original prevalence values; >0
+  x1 = runif(400, min = 0, max = 4),
+  x2 = rbinom(400, prob = 0.5, size = 1),
+  obs_method = sample(c("selfreported", "measured"), size = 400, replace = TRUE)
+)
+df_orig$row_id <- paste0("row", 1:nrow(df_orig))
+head(df_orig)
+```
+
+
+Next we use the `crosswalk` functions. `CWData()` prepares the data for meta-regression, and `CWModel()` fits the model. Inputs to the function parameters are described in the comments below, and more information is available in the R package help documentation. Some additional tips...
+
+* When crosswalking one alternative to one reference definition/method, there will be only one value in each of the columns passed to `alt_dorms` and `ref_dorms` (e.g. "selfreported" and "measured", respectively). This may seem like an unnecessary detail now, but it allows for simpler specification of a network meta-analysis within the same framework. More on that in Example 2. 
+* The `cov_models` parameter takes a list of `CovModel()` function calls. These specify the functional form and/or constraints for each predictor in the model; see `help(CovModel)` for more information. 
+* If you want a model with an intercept, you have to explicitly pass in `CovModel(cov_name = "intercept")` as an element of `cov_models = list(...)`. Note that for network meta-analysis, we almost always *do* want to include an "intercept", which seems at odds with the guidance from GBD 2019. What changed is the definition of intercept, not the model. See the crosswalk training slides (https://rpubs.com/rsoren/572599) for a mathematical explanation. Briefly, "intercepts" refer to what in GBD 2019 were the ${-1,0,1}$ variables that encode the network structure. You no longer have to create these variables yourself, and instead only need to specify `CovModel("intercept")` in a network meta-analysis like the one in Example 2. 
+* A continuous covariate can be represented as a spline with the `XSpline()` function. It takes arguments about polynomial degree, linearity in the tails and knot location (must include external knots at <=min and >= max values of the covariate). Relatedly, constraints on spline direction and shape may be specified in the `CovModel()` function with the `spline_monotonicity` and `spline_convexity` arguments. An example is commented out below. 
+
+```{r echo = FALSE}
+source("filepaths.R")
+```
+
+```{r message = FALSE}
+df1 <- CWData(
+  df = df_matched,          # dataset for metaregression
+  obs = "logit_diff",       # column name for the observation mean
+  obs_se = "logit_diff_se", # column name for the observation standard error
+  alt_dorms = "altvar",     # column name of the variable indicating the alternative method
+  ref_dorms = "refvar",     # column name of the variable indicating the reference method
+  covs = list("x1", "x2"),     # names of columns to be used as covariates later
+  study_id = "group_id",    # name of the column indicating group membership, usually the matching groups
+  add_intercept = TRUE      # adds a column called "intercept" that may be used in CWModel()
+)
+fit1 <- CWModel(
+  cwdata = df1,            # object returned by `CWData()`
+  obs_type = "diff_logit", # "diff_log" or "diff_logit" depending on whether bounds are [0, Inf) or [0, 1]
+  cov_models = list(       # specifying predictors in the model; see help(CovModel)
+    CovModel(cov_name = "intercept"),
+    CovModel(cov_name = "x1"),
+    # CovModel(cov_name = "x1", spline = XSpline(knots = c(0,1,2,3,4), degree = 3L, l_linear = TRUE, r_linear = TRUE), spline_monotonicity = "increasing"),
+    CovModel(cov_name = "x2") ),
+  gold_dorm = "measured"   # the level of `alt_dorms` that indicates it's the gold standard
+                           # this will be useful when we can have multiple "reference" groups in NMA
+)
+print(data.frame( # checking that the model recovers the true betas
+  beta_true = c(beta0_true, beta1_true, beta2_true), 
+  beta_mean = fit1$beta[4:6],
+  beta_se = fit1$beta_sd[4:6]
+))
+```
+To create a data frame with estimated coefficients, use `create_result_df()`. This is useful for saving coefficient summaries to CSV. To save a model object for future use, use `py_save_object()`. 
+```{r eval=FALSE}
+df_result <- fit1$create_result_df()
+write.csv(df_result, file.path(path_to_misc_outputs, "df_result_crosswalk.csv"))
+py_save_object(object = fit1, filename = file.path(path_to_misc_outputs, "fit1.pkl"), pickle = "dill")
+fit1 <- py_load_object(filename = file.path(path_to_misc_outputs, "fit1.pkl"), pickle = "dill")
+```
+
+
+
+
+Finally, `adjust_orig_vals()` adjusts biased observations in the original dataset using the meta-regression model to predict the degree of bias. The `adjust_orig_vals()` function has a few requirements:
+
+* While we manually calculated the log- or logit-scale differences for the meta-regression model, for `adjust_orig_vals()` we leave the parameter of interest in linear space.
+* For a log-scale crosswalk, `adjust_orig_vals()` cannot make adjustments for observations where the parameter value is zero. This happens because `log(0) = -Inf`. The same happens in logit-scale crosswalks with parameter values of 0 or 1, because `logit(0) = -Inf` and `logit(1) = Inf`. For this reason, `adjust_orig_vals()` will throw an error if the data frame includes observations exactly at the bound(s). 
+* Variables used as predictors in the meta-regression model must also be present in dataset passed to `adjust_orig_vals()`, with the same column names. 
+* The meta-regression model estimates a random effect for each group specified by the `study_id` variable. Whether you want to predict out on these random effects is a modeling decision that depends on whether you believe the random component captures true variation in the crosswalk adjustment, as opposed to noise in the data. As a default we leave the `adjust_orig_vals(..., study_id = NULL)` parameter unspecified and do not predict out on the random effects. 
+
+
+```{r message = FALSE}
+preds1 <- adjust_orig_vals(
+  fit_object = fit1, # object returned by `CWModel()`
+  df = df_orig,
+  orig_dorms = "obs_method",
+  orig_vals_mean = "meanvar",
+  orig_vals_se = "sdvar",
+  data_id = "row_id"   # optional argument to add a user-defined ID to the predictions;
+                       # name of the column with the IDs
+)
+# the result of adjust_orig_vals() is a five-element list,
+# vectors containing: 
+# -- the adjusted mean and SE of the adjusted mean in linear space
+# -- the adjustment factor and SE of the adjustment factor in transformed space;
+#    note that the adjustment factor is the alt-ref prediction,
+#    so we *subtract* this value to make the adjustment
+# -- an identifier for the row of the prediction frame the corresponds to the prediction
+lapply(preds1, head)
+# now we add the adjusted values back to the original dataset
+df_orig[, 
+  c("meanvar_adjusted", "sdvar_adjusted", 
+    "pred_logit", "pred_se_logit", "data_id")] <- preds1
+# note that the gold standard observations remain untouched
+head(df_orig)
+```
+
+To make sure we understand what's going on, let's manually calculate the adjustment for a particular row of the original dataset.
+
+```{r message = FALSE}
+print(df_orig[3,]) # row 3 is a self-reported observation with prevalence 0.296
+fit1$fixed_vars # estimated betas
+# the predicted adjustment for an observations with x1=0.8575217 and x2=1 should be...
+(pred <- -3.164455 + 1.081816*0.8575217 + 2.076966*1)
+# the prediction is defined as logit(alt) - logit(ref), so the final adjusted value should be
+# logit(mean_adjusted) = logit(mean_alt) - prediction
+logit <- function(p) log(p/(1-p))
+inv_logit <- function(x) exp(x)/(1+exp(x))
+logit_mean_adjusted <- logit(df_orig[3, "meanvar"]) - pred
+inv_logit(logit_mean_adjusted)
+# check that it's the same
+round(inv_logit(logit_mean_adjusted), digits = 5) == round(df_orig[3, "meanvar_adjusted"], digits = 5)
+# SE of the adjusted data point is calculated as sqrt(a^2 + b^2 + c^2), where
+# a is the (log or logit) standard error of the original data point,
+# b is the standard error of the predicted adjustment
+# c is the standard deviation of between-group heterogeneity, a.k.a. sqrt(gamma)
+#
+# note that a, b, and c are all in transformed (log or logit) space
+# 
+# this method increases an adjusted observation's uncertainty and effectively downweights it in subsequent analyses, like an ST-GPR model to estimate prevalence globally
+#
+```
+
+
+## Example 2: one reference and multiple alternatives, with indirect comparisons {#ex2}
+
+Network meta-analysis is a method that allows the model to incorporate information from indirect comparisons. For example, in the case below, we have a gold standard diagnostic method A and two alternatives B and C. To adjust B and C observations to their predicted A-equivalents, the best input data we could give the meta-regression is many direct comparisons of B:A and C:A. However, B:C comparisons also help to inform the beta estimates for B:A and C:A, even if B:C is not the quantity of interest. In the example, we specify that the adjustment factor should vary by the level of a continuous covariate `x1`. By excluding intercepts, we ensure that the adjustment factor is 0 when the value of `x1` is 0. 
+
+Note that most network meta-analyses will want to include an intercept term in the list passed to `cov_models`. The model will return a coefficient for each definition that answers the question: here's how much you need to adjust a reference observation to make it equivalent to the alternative definition. As described above, this is different than the guidance in GBD 2019 because the word "intercept" now refers to the ${-1,0,1}$ variables that encode the network. 
+
+First, we create some simulated data. The column indicating which diagnostic is the reference (`refvar`) can include A, B and C. The column indicating the alternative diagnostic (`altvar`) includes only the alternatives, B and C. This means that both B and C can act as a "reference" for an indirect comparison, i.e. the order B:C or C:B doesn't matter.
+
+```{r}
+set.seed(123)
+true_beta1 <- 1 # define the true coefficient value for x1
+case_defs <- c(B = 2, C = 3) # define case definitions and true coefficient values
+df_matched2 <- data.frame(id = 1:400) %>%
+  mutate(
+    altvar = sample(c("B", "C"), nrow(.), TRUE),
+    refvar = sample(c("A", "B", "C"), nrow(.), TRUE),
+    x1 = runif(n = nrow(.), min = 0, max = 10),
+    logit_diff = rnorm(n = nrow(.)),
+    logit_diff = logit_diff + (altvar == "B")*case_defs["B"] * x1*true_beta1,
+    logit_diff = logit_diff + (altvar == "C")*case_defs["C"] * x1*true_beta1,
+    logit_diff = logit_diff - (refvar == "B")*case_defs["B"] * x1*true_beta1,
+    logit_diff = logit_diff - (refvar == "C")*case_defs["C"] * x1*true_beta1,
+    # logit_diff_se = runif(n = nrow(.), min = 0.4, max = 0.6),
+    logit_diff_se = runif(n = nrow(.), min = 0.4, max = 0.6),
+    group_id = sample(1:20, size = nrow(.), replace = TRUE)) %>%
+  arrange(group_id) %>%
+  filter(altvar != refvar) %>%
+  select(altvar, refvar, logit_diff, logit_diff_se, x1, group_id)
+head(df_matched2)
+```
+
+
+Next we specify the model the same way as in Example 1, with an important exception. We can give `CWModel()` a prior indicating whether one alternative should give a smaller adjustment than another, using the `order_prior` parameter. It takes a list of two-element vectors, with the first element indicating which diagnostic should have the lower crosswalk adjustment. `order_prior` is useful when one alternative definition is a subset of another. For example, if C is prevalence of current smokers and B is prevalence of daily smokers, B is a subset of C by definition. The default is not to include order priors. 
+
+```{r}
+df2 <- CWData(
+  df = df_matched2,         # dataset for metaregression
+  obs = "logit_diff",       # column name for the observation mean
+  obs_se = "logit_diff_se", # column name for the observation standard error
+  alt_dorms = "altvar",     # column name of the variable indicating the alternative method
+  ref_dorms = "refvar",     # column name of the variable indicating the reference method
+  covs = list("x1"),        # names of columns to be used as covariates later
+  # covs = list(),        # names of columns to be used as covariates later
+  study_id = "group_id"     # name of the column indicating group membership, usually the matching groups
+)
+fit2 <- CWModel(
+  cwdata = df2,            # object returned by `CWData()`
+  obs_type = "diff_logit", # "diff_log" or "diff_logit" depending on whether bounds are [0, Inf) or [0, 1]
+  cov_models = list(       # specying predictors in the model; see help(CovModel)
+    # CovModel(cov_name = "intercept") ),
+    CovModel(cov_name = "x1") ),
+  gold_dorm = "A",   # the level of `ref_dorms` that indicates it's the gold standard
+  order_prior = list(c("B", "C")) # tells the model that the coefficient estimated for B should be <= the coefficient for C
+)
+df_tmp <- fit2$create_result_df()
+print(data.frame( # checking that the model recovers the true betas
+  beta_true = case_defs,
+  beta_mean = fit2$beta[2:3],
+  beta_se = fit2$beta_sd[2:3]
+))
+```
+
+Finally, as before, we use the model to adjust biased observations in the original dataset. 
+
+```{r}
+df_orig2 <- data.frame(id = 1:600) %>%
+  mutate(
+    meanvar = runif(n = nrow(.), min = 0.2, max = 0.8),
+    sdvar = runif(n = nrow(.), min = 0.4, max = 0.6),
+    x1 = runif(n = nrow(.), min = 0, max = 10),
+    group_id = sample(1:20, size = nrow(.), replace = TRUE),
+    intercept = 0,
+    obs_method = sample(c("A", "B", "C"), nrow(.), TRUE) )
+head(df_orig2)
+preds2 <- adjust_orig_vals(
+  fit_object = fit2, # object returned by `CWModel()`
+  df = df_orig2,
+  orig_dorms = "obs_method",
+  orig_vals_mean = "meanvar",
+  orig_vals_se = "sdvar"
+)
+# now we add the adjusted values back to the original dataset
+df_orig2[, c(
+  "meanvar_adjusted", "sdvar_adjusted", "pred_logit", 
+  "pred_se_logit", "data_id")] <- preds2
+# note that the gold standard observations remain untouched
+head(df_orig2)
+```
+
+
+## Example 3: one reference and multiple alternatives; alternatives composed of sub-definitions {#ex3}
+
+Sometimes alternative definitions are not mutually exclusive. For example, maybe the gold standard way to measure prevalence is with diagnostic tool A and among the general population. However, some observations measured prevalence with diagnostic tool B and/or only in urban populations (C). In addition to using the non-standard diagnostic tool in the general population (denoted as "B"), alternative observations can take on values of "C" or "B_C" if the prevalence was measured in an urban population. We account for this in a crosswalk adjustment by assuming additivity of the sub-definitions, i.e. the logit-space adjustment due to taking prevalence in an urban population is the same regardless of which diagnostic tool was used. As in Example 2, we relax the requirement that prevalence comparisons must include the gold-standard reference. Network meta-analysis allows the model to take advantage of comparisons between two alternative definitions, e.g. "B" and "B_C".
+
+```{r}
+set.seed(1)
+df3 <- data.frame(id = 1:400)
+#####
+# create the simulated dataset
+# define case definitions and coefficients for simulation
+case_defs <- c(B = 2, C = 3)
+n_sample_defs <- 2
+# randomly sample from case definition components to make combined case definitions
+df3$alt <- sapply(1:nrow(df3), function(i) {
+  paste(sort(sample(x = names(case_defs), size = sample(1:n_sample_defs))), collapse = '_')
+})
+df3$ref <- sapply(1:nrow(df3), function(i) {
+  paste(sort(sample(x = names(case_defs), size = sample(1:n_sample_defs))), collapse = '_')
+})
+# make half of the reference case definitions 'A' to signify the gold standard
+df3$ref <- ifelse(df3$id %% 2 == 0, "A", df3$ref)
+df4 <- filter(df3, ref != alt) # remove duplicates
+# subtract coefficient if component is in the reference def, and 
+# add coefficient if component is in the alternative def
+df4$logit_prev_diff <- 0
+for (i in names(case_defs)) df4$logit_prev_diff <- df4$logit_prev_diff - (sapply(i, grepl, df4$ref) * case_defs[i])
+for (i in names(case_defs)) df4$logit_prev_diff <- df4$logit_prev_diff + (sapply(i, grepl, df4$alt) * case_defs[i])
+df4$logit_prev_diff <- as.numeric(df4$logit_prev_diff + rnorm(n = nrow(df4), mean = 0, sd = 1))
+df4$logit_prev_diff_se <- 0.5
+head(df4)
+```
+
+To use composite definitions -- alternative definitions with non-mutually exclusive sub-definitions -- we include a delimiter in the values we pass to the `alt_dorms` and `ref_dorms` columns. If the delimiter is "_" as in this example, we pass it as an argument to the `dorm_separator` parameter of `CWData()`. 
+
+```{r}
+#####
+dat4 <- CWData(
+  df = df4,
+  obs = "logit_prev_diff",
+  obs_se = "logit_prev_diff_se",
+  alt_dorms = "alt",
+  ref_dorms = "ref",
+  dorm_separator = "_",
+  covs = list(),
+  study_id = "id",
+  add_intercept = TRUE
+)
+fit4 <- CWModel(
+  cwdata = dat4,
+  obs_type = "diff_logit",
+  cov_models = list(CovModel("intercept")),
+  # # we can put priors on the beta for a specific alternative definition:
+  # cov_models = list(CovModel("intercept", prior_beta_uniform = list(B = array(c(0,0))))),
+  gold_dorm = "A"
+  # prior_gamma_uniform = array(c(0, 0.4))
+)
+fit4$fixed_vars
+case_defs
+```
+```{r}
+df_orig4 <- df4 %>%
+  mutate(
+    prev_orig = runif(n = nrow(.), 0.1, 0.9),
+    prev_orig_se = 0.2,
+    meas_method = ref) %>%
+  select(-ref, -alt, -logit_prev_diff, -logit_prev_diff_se)
+preds4 <- adjust_orig_vals(
+  fit_object = fit4, # object returned by `CWModel()`
+  df = df_orig4,
+  orig_dorms = "meas_method",
+  orig_vals_mean = "prev_orig",
+  orig_vals_se = "prev_orig_se"
+)
+df_orig4[, c("prev_adjusted", "prev_se_adjusted", "prediction_logit", 
+             "prediction_se_logit", "data_id")] <- preds4
+head(df_orig4)
+```
+
+
+## Funnel plots and dose-response plots {#ex4}
+
+To assess the fit of a crosswalk model, we use a funnel plot to see how well a single crosswalk coefficient describes the data. When the crosswalk adjustment varies by levels of a continuous variable, we use a dose-response plot. First, to enable the use of the `matplotlib` library in the underlying Python code, we run `repl_python()` to open an interactive Python interpreter, then type `exit` in the console to return to the R interpreter. (We're still figuring out why this is necessary and will fix it when we do!)
+
+If any covariates were included in the meta-regression model, the `plots$funnel_plot()` and `plots$dose_response_curve()` functions assume a covariate value of zero unless otherwise specified by the `continuous_variables` parameter. The prediction will be based upon the median value observed in the input data for all variables names passed to `continuous_variables`. `obs_method` indicates which alternative definition/method (dorm) should be visualized, compared to the gold standard reference. This parameter should be specified regardless of whether or not there are multiple alternative definitions. 
+
+PDFs of the plots are saved in the location passed to `plots_dir`.
+
+
+```{r echo=TRUE, eval=FALSE}
+df_matched5 <- data.frame(id = 1:200) %>%
+  mutate(
+    logit_diff_se = runif(nrow(.), 0.5, 10),
+    logit_diff = 5 + rnorm(nrow(.), 0, logit_diff_se),
+    altvar = ifelse(row_number() %% 8 == 0, "awefawef", "selfreported"),
+    refvar = "measured",
+    group_id = rep(1:10, each = 20)
+  )
+dat5 <- CWData(
+  df = df_matched5,
+  obs = "logit_diff",
+  obs_se = "logit_diff_se",
+  alt_dorms = "altvar",
+  ref_dorms = "refvar",
+  covs = list(),
+  study_id = "group_id",
+  add_intercept = TRUE
+)
+fit5 <- CWModel(
+  cwdata = dat5,
+  obs_type = "diff_logit",
+  cov_models = list(
+    CovModel(cov_name = "intercept") ),
+  gold_dorm = "measured",
+  inlier_pct = 0.9
+)
+##### don't forget to run repl_python() !
+# ... then type 'exit' to get back to the R interpreter
+repl_python()
+plots <- import("crosswalk.plots")
+plots$funnel_plot(
+  cwmodel = fit5, 
+  cwdata = dat5,
+  continuous_variables = list(),
+  obs_method = 'selfreported',
+  plot_note = 'Funnel plot example', 
+  plots_dir = path_to_misc_outputs, 
+  file_name = "funny_plot_example_v10",
+  write_file = TRUE
+)
+```
+
+For the dose-response plot, the variable given to `dose_variable` will be on the x-axis.
+
+```{r echo=TRUE, eval=FALSE}
+plots$dose_response_curve(
+  dose_variable = 'x1',
+  obs_method = 'B', 
+  continuous_variables=list(), 
+  cwdata=df2, 
+  cwmodel=fit2, 
+  plot_note="Example dose-response plot", 
+  plots_dir=path_to_misc_outputs, 
+  file_name = "doseresponse_plot_example_v7", 
+  write_file=TRUE)
+# py_run_string("import importlib; importlib.reload(plots)")
+# importlib <- import("importlib")
+# plots <- importlib$reload(plots)
+```
+
+
+
+
+
+
+<!--chapter:end:03-crosswalk.Rmd-->
+
+# Troubleshooting {#troubleshooting}
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+### What does this error message mean?
+
+
+
+
+### Why do my predictions look bad?
+
+
+
+
+
+### How do I make a reproducible example?
+
+Please provide:
+
+- A link to a CSV with the data,
+
+- The minimal amount of code needed to reproduce the problem, after refreshing the session with `Session --> Restart R` and clearing objects from the environment with `rm(list = ls())`,
+
+- The output of `sessionInfo()`.
+
+
+
+
+
+
+
+
+
+<!--chapter:end:99-troubleshooting.Rmd-->
+
