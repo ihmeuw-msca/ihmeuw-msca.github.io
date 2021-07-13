@@ -74,7 +74,6 @@ mod1 <- MRBRT(
 
 mod1$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
 
-# df_pred1 <- data.frame(x1 = seq(0, 10, by = 2), study_id = "4")
 df_pred1 <- data.frame(x1 = seq(0, 10, by = 0.1))
 
 dat_pred1 <- MRData()
@@ -101,59 +100,93 @@ If you don't need uncertainty estimates, this option is the fastest.
 
 
 ```r
-# pred1 <- mod1$create_draws(
-#   data = dat_pred1,
-#   sample_size = 1L,
-#   beta_samples = matrix(mod1$beta_soln, nrow = 1), 
-#   gamma_samples = matrix(mod1$gamma_soln, nrow = 1), 
-#   use_re = FALSE  )
-
-pred1 <- mod1$predict(data = dat_pred1)
-
-df_pred1$pred1 <- pred1
+df_pred1$pred0 <- mod1$predict(data = dat_pred1)
 with(df_sim1, plot(x1, y1))
-with(df_pred1, lines(x1, pred1))
+with(df_pred1, lines(x1, pred0))
 ```
 
 <img src="02-mrbrt_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+### -- Uncertainty from fixed effects only (using asymptotic statistics) {#section1_2}
+
+If we can assume that the posterior distributions of the parameters are Gaussian (i.e. no hard constraints specified in the model), we can obtain samples from the fixed effects using a fast algorithm. 
+
+
+```r
+n_samples1 <- 1000L
+
+samples1 <- core$other_sampling$sample_simple_lme_beta(
+  sample_size = n_samples1, 
+  model = mod1
+)
+
+draws1 <- mod1$create_draws(
+  data = dat_pred1,
+  beta_samples = samples1,
+  gamma_samples = matrix(rep(0, n_samples1), ncol = 1),
+  random_study = FALSE )
+
+df_pred1$pred1 <- mod1$predict(data = dat_pred1)
+df_pred1$pred1_lo <- apply(draws1, 1, function(x) quantile(x, 0.025))
+df_pred1$pred1_hi <- apply(draws1, 1, function(x) quantile(x, 0.975))
+with(df_sim1, plot(x1, y1))
+with(df_pred1, lines(x1, pred1))
+add_ui(df_pred1, "x1", "pred1_lo", "pred1_hi")
+```
+
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+
 
 <br>
 
-### -- Uncertainty from fixed effects only {#section1_2}
+### -- Uncertainty from fixed effects only (using fit-refit) {#section1_2}
+
+We use the fit-refit method for obtaining samples from the parameters when there are uniform priors (a.k.a. constraints) specified in the model, which can make the posterior distributions of parameters not Gaussian. This code using `mod1$sample_soln` gives the same result as above.
+
 
 ```r
-n_samples <- 1000L
-samples2 <- mod1$sample_soln(sample_size = n_samples)
+n_samples2 <- 1000L 
 
-draws2 <- mod1$create_draws(
+samples2_fitrefit <- mod1$sample_soln(sample_size = n_samples2)
+
+draws2_fitrefit <- mod1$create_draws(
   data = dat_pred1,
-  beta_samples = samples2[[1]],
-  gamma_samples = samples2[[2]],
+  beta_samples = samples2_fitrefit[[1]],
+  gamma_samples = samples2_fitrefit[[2]],
   random_study = FALSE )
 
 df_pred1$pred2 <- mod1$predict(data = dat_pred1)
-df_pred1$pred2_lo <- apply(draws2, 1, function(x) quantile(x, 0.025))
-df_pred1$pred2_hi <- apply(draws2, 1, function(x) quantile(x, 0.975))
+df_pred1$pred2_lo <- apply(draws2_fitrefit, 1, function(x) quantile(x, 0.025))
+df_pred1$pred2_hi <- apply(draws2_fitrefit, 1, function(x) quantile(x, 0.975))
 with(df_sim1, plot(x1, y1))
 with(df_pred1, lines(x1, pred2))
 add_ui(df_pred1, "x1", "pred2_lo", "pred2_hi")
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-6-1.png" width="672" />
-
 <br>
 
 ### -- Uncertainty from fixed effects and between-study heterogeneity {#section1_3}
 
+When we require samples of gamma (uncertainty in the parameter that estimates between-study heterogeneity), we need to use the `sample_soln` approach. 
+
+
 ```r
-n_samples <- 1000L
-samples3 <- mod1$sample_soln(sample_size = n_samples)
+n_samples3 <- 1000L
+samples3 <- mod1$sample_soln(sample_size = n_samples3)
 
 draws3 <- mod1$create_draws(
   data = dat_pred1,
   beta_samples = samples3[[1]],
-  gamma_samples = samples3[[2]],
+  gamma_samples = samples3[[2]], 
   random_study = TRUE )
+
+# if a single value of gamma is sufficient (not sampling from the uncertainty of gamma), 
+# you can pass in the point estimate for gamma like this:
+#
+# draws3 <- mod1$create_draws(
+#   data = dat_pred1,
+#   beta_samples = samples3[[1]],
+#   gamma_samples = matrix(rep(mod1$gamma_soln, n_samples3), ncol = 1),
+#   random_study = TRUE )
 
 df_pred1$pred3 <- mod1$predict(dat_pred1)
 df_pred1$pred3_lo <- apply(draws3, 1, function(x) quantile(x, 0.025))
@@ -163,13 +196,17 @@ with(df_pred1, lines(x1, pred3))
 add_ui(df_pred1, "x1", "pred3_lo", "pred3_hi")
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-8-1.png" width="672" />
 
 
 <br>
 
 ### -- Predicting out on the random effects {#section1_4}
-To ensure that predictions from `predict()` (and `create_draws()`) align with the corresponding rows of the input data, either: 1) set `sort_by_data_id = TRUE`; or 2) follow the instructions below.
+
+To incorporate the estimated random effects into point predictions, specify `col_study_id` in the data object you pass to the `predict()` function, and set `predict_for_study = TRUE` and `sort_by_data_id = TRUE` in the `predict()` function. 
+
+Important! If `sort_by_data_id = TRUE` is not specified, the predictions might not line up with the rows of the prediction data frame. 
+
 
 ```r
 # 1. convert prediction frame into a MRData() object
@@ -178,9 +215,12 @@ To ensure that predictions from `predict()` (and `create_draws()`) align with th
 
 dat_sim1_tmp <- MRData()
 dat_sim1_tmp$load_df(data = df_sim1, col_covs = list("x1"), col_study_id = "study_id")
-df_sim1_tmp <- dat_sim1_tmp$to_df()
-df_sim1_tmp$pred_re <- mod1$predict(data = dat_sim1_tmp, predict_for_study = TRUE)
 
+df_sim1$pred_re <- mod1$predict(
+  data = dat_sim1_tmp, 
+  predict_for_study = TRUE, 
+  sort_by_data_id = TRUE
+)
 
 with(df_sim1, plot(x1, y1))
 for (id in unique(df_sim1$study_id)) {
@@ -188,18 +228,18 @@ for (id in unique(df_sim1$study_id)) {
 }
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-9-1.png" width="672" />
 
 ```r
 with(df_sim1, plot(x1, y1))
 for (id in unique(df_sim1$study_id)) {
   # id <- 4 # dev
-  df_tmp <- filter(arrange(df_sim1_tmp, x1), study_id == id)
+  df_tmp <- filter(arrange(df_sim1, x1), study_id == id)
   with(df_tmp, lines(x1, pred_re, lty = 1))
 }
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-8-2.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-9-2.png" width="672" />
 
 ```r
 # to get the random effects by group...
@@ -225,26 +265,18 @@ mod3 <- MRBRT(
 
 mod3$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
 
-# dat_sim1_tmp <- MRData()
-# dat_sim1_tmp$load_df(data = df_sim1, col_covs = list("x1"), col_study_id = "study_id")
-# df_sim1_tmp <- dat_sim1_tmp$to_df()
-# df_sim1_tmp$pred_re_prior <- mod3$predict(data = dat_sim1_tmp, predict_for_study = TRUE)
-
 dat_sim1_tmp <- MRData()
 dat_sim1_tmp$load_df(data = df_sim1, col_covs = list("x1"), col_study_id = "study_id")
 df_sim1$pred_re_prior <- mod3$predict(data = dat_sim1_tmp, predict_for_study = TRUE, sort_by_data_id = TRUE)
 
-
 with(df_sim1, plot(x1, y1))
 for (id in unique(df_sim1$study_id)) {
-  # id <- 4 # dev
-  # df_tmp <- filter(arrange(df_sim1_tmp, x1), study_id == id)
   df_tmp <- filter(arrange(df_sim1, x1), study_id == id)
   with(df_tmp, lines(x1, pred_re_prior, lty = 1))
 }
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-9-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-10-1.png" width="672" />
 
 <br>
 
@@ -266,7 +298,7 @@ with(df_sim1, plot(x1, y1))
 with(df_pred1, lines(x1, pred4))
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-10-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-11-1.png" width="672" />
 
 
 
@@ -299,8 +331,7 @@ mod2 <- MRBRT(
   inlier_pct = 0.9)
 
 mod2$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
-pred4 <- mod2$predict(data = dat_pred2)
-df_pred2$pred4 <- pred4
+df_pred2$pred4 <- mod2$predict(data = dat_pred2)
 
 # get a data frame with estimated weights
 df_mod2 <- cbind(mod2$data$to_df(), data.frame(w = mod2$w_soln))
@@ -313,7 +344,7 @@ with(df_mod2, plot(
 with(df_pred2, lines(x1, pred4))
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-12-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-13-1.png" width="672" />
 
 
 ## Splines {#section4}
@@ -347,8 +378,8 @@ mod5 <- MRBRT(
       use_spline = TRUE,
       # spline_knots = array(c(0, 0.25, 0.5, 0.75, 1)),
       spline_knots = array(seq(0, 1, by = 0.2)),
-      spline_degree = 3L,
-      spline_knots_type = 'frequency',
+      spline_degree = 2L,
+      spline_knots_type = 'domain',
       spline_r_linear = TRUE,
       spline_l_linear = FALSE
       # prior_spline_monotonicity = 'increasing'
@@ -361,45 +392,26 @@ mod5 <- MRBRT(
 
 mod5$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
 
-# df_pred1 <- data.frame(x1 = seq(0, 10, by = 2), study_id = "4")
 df_pred3 <- data.frame(x1 = seq(0, 10, by = 0.1))
-
 dat_pred3 <- MRData()
-
 dat_pred3$load_df(
   data = df_pred3, 
   col_covs=list('x1')
 )
 
-pred5 <- mod5$predict(data = dat_pred3)
-
-df_pred3$pred5 <- pred5
+df_pred3$pred5 <- mod5$predict(data = dat_pred3)
 with(df_sim1, plot(x1, y2))
 with(df_pred3, lines(x1, pred5))
+
+# # visualize knot locations
+for (k in mod5$cov_models[[2]]$spline_knots) abline(v = k, col = "gray")
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-13-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-14-1.png" width="672" />
 
 ### - Ensemble splines {#section4_2}
 
-Arguments for the `sample_knots()` function (from `py_help(utils$sample_knots)` in an interactive session):
-
-    Args:
-        num_intervals (int): Number of intervals (number of knots minus 1).
-        knot_bounds (np.ndarray | None, optional):
-            Bounds for the interior knots. Here we assume the domain span 0 to 1,
-            bound for a knot should be between 0 and 1, e.g. [0.1, 0.2].
-            `knot_bounds` should have number of interior knots of rows, and each row
-            is a bound for corresponding knot, e.g.
-                `knot_bounds=np.array([[0.0, 0.2], [0.3, 0.4], [0.3, 1.0]])`,
-            for when we have three interior knots.
-        interval_sizes (np.ndarray | None, optional):
-            Bounds for the distances between knots. For the same reason, we assume
-            elements in `interval_sizes` to be between 0 and 1. For example,
-                `interval_distances=np.array([[0.1, 0.2], [0.1, 0.3], [0.1, 0.5], [0.1, 0.5]])`
-            means that the distance between first (0) and second knot has to be between 0.1 and 0.2, etc.
-            And the number of rows for `interval_sizes` has to be same with `num_intervals`.
-        num_samples (int): Number of knots samples.
+See this link about arguments for the `sample_knots()` function (or do `py_help(utils$sample_knots)` in an interactive session): https://github.com/ihmeuw-msca/mrtool/blob/740f605264732f0faa604614a987fc38c7d88f83/src/mrtool/core/utils.py#L293. 
 
 
 ```r
@@ -433,26 +445,22 @@ mod5a <- MRBeRT(
 
 mod5a$fit_model(inner_print_level = 5L, inner_max_iter = 1000L)
 
-# df_pred1 <- data.frame(x1 = seq(0, 10, by = 2), study_id = "4")
 df_pred3 <- data.frame(x1 = seq(0, 10, by = 0.1))
-
 dat_pred3 <- MRData()
-
 dat_pred3$load_df(
   data = df_pred3, 
   col_covs=list('x1')
 )
 
 # this predicts a weighted average from the spline ensemble
-pred5a <- mod5a$predict(data = dat_pred3)
-df_pred3$pred5a <- pred5a
+df_pred3$pred5a <- mod5a$predict(data = dat_pred3)
 
 
 with(df_sim1, plot(x1, y2))
 with(df_pred3, lines(x1, pred5a))
 ```
 
-<img src="02-mrbrt_files/figure-html/unnamed-chunk-14-1.png" width="672" />
+<img src="02-mrbrt_files/figure-html/unnamed-chunk-15-1.png" width="672" />
 
 ```r
 # # view all splines in the ensemble
@@ -464,7 +472,6 @@ with(df_pred3, lines(x1, pred5a))
 #   tmp <- pred5a[i, ]
 #   with(df_pred3, lines(x1, tmp))
 # }
-#
 ```
 
 
@@ -474,20 +481,19 @@ with(df_pred3, lines(x1, pred5a))
 
 This model is useful when a covariate is represented as a range. For example, often population-level data are indexed by age group. We can represent this in the model as `alt_cov = c("age_start", "age_end")`. Or if a relative risk estimate corresponds to a comparison of two BMI ranges, we specify the model as `alt_cov = c("b_0", "b_1")` and `ref_cov = c("a_0", "a_1")`. When predicting out, we need to set a constant reference level and varying alternative level. 
 
-
 For `LogCovModel`, our regression model can be represented as
 
 $y = ln(1 + X_{alt}\beta) - ln(1 + X_{ref}\beta)$,
 
-where $X_{alt} and $X_{ref} are the design matrix for the alternative and reference groups. They could be either covariates or the spline design matrices from the covariates.
+where $X_{alt}$ and $X_{ref}$ are the design matrix for the alternative and reference groups. They could be either covariates or the spline design matrices from the covariates.
 
 When we want to include the random effects, we always assume a random "slope",
 
 $y = (\frac{ln(1 + X_{alt}\beta) - ln(1 + X_{ref}\beta)}{X_{alt}-X_{ref}} + u)(X_{alt}-X_{ref})$
 
-For ratio model it doesn't need 'intercept', due to the reason of we are considering relative risk, where measurement is invariant with the scaling of the curve.
+Ratio models do not need an intercept specified, as we are considering relative risk where measurement is invariant with the scaling of the curve.
 
-In the ratio model, if we set `use_re=True`, we automatically turn on the `use_re_mid_point`, since for log relative risk, we always consider the random effects as the random average slope.
+In the ratio model, if we set `use_re=TRUE`, we automatically turn on the `use_re_mid_point`, since for log relative risk, we always consider the random effects as the random average slope.
 
 We use spline to parameterize the relative risk curve in the linear space, and all the shape constraints are in linear space.
 
@@ -620,6 +626,10 @@ covfinder$select_covs(verbose = TRUE)
 covfinder$selected_covs
 ```
 
+```
+## [1] "cov1" "cov3" "cov5"
+```
+
 
 <br><br>
 
@@ -631,10 +641,10 @@ The code below creates a dataset for simulating the effect of a dichotomous risk
 
 
 ```r
-# create simulated data, run model and get draws 
+# get simulated data, run model and get draws 
 # for passing to the Scorelator function
 
-df_sim7_in <- read.csv("/ihme/code/mscm/R/example_data/linear_sim_evidence_score_0_0.5.csv")
+df_sim7_in <- read.csv("example_data/linear_sim_evidence_score_0_0.5.csv")
 
 cutoff = round(quantile(df_sim7_in$b_1, probs = 0.3), 2)
 
