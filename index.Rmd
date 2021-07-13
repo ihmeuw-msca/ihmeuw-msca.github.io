@@ -15,7 +15,9 @@ description: "A guide to statistical tools developed by IHME's Math Sciences tea
 
 # Introduction
 
-This book describes how to use statistical packages developed by the Mathematical Sciences team at the Institute for Health Metrics and Evaluation (IHME). The packages are the result of pioneering work by Dr. Aleksandr Aravkin (director) and Dr. Peng Zheng with auxiliary input from several others. While the goal here is to provide internal documentation for IHME staff, the packages are open source and can be run by anyone. We provide installation instructions for both audiences in Chapter 2. We make heavy use of the `reticulate` R package to make Python functions available to R users. 
+This book describes how to use statistical packages developed by the Mathematical Sciences team at the Institute for Health Metrics and Evaluation (IHME). The packages are the result of pioneering work by Dr. Aleksandr Aravkin (director) and Dr. Peng Zheng with auxiliary input from several others. While the goal here is to provide internal documentation for IHME staff, the packages are open source and can be run by anyone. We provide installation instructions for both audiences in Chapter 2. We frequently use the `reticulate` R package to make Python functions available to R users. 
+
+Please visit our GitHub repo at: https://github.com/ihmeuw-msca.
 
 ```{r include=FALSE}
 # automatically create a bib database for R packages
